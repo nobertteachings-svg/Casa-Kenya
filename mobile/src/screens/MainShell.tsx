@@ -46,7 +46,7 @@ export default function MainShell({
   onPendingListingHandled,
   onNeedLogin,
 }: Props) {
-  const lang = "en" as const;
+  const lang = uiLanguage;
   const m = t(lang);
   const { ui } = useCasaTheme();
   const isLandlord = user?.role === "landlord" && !needsSignup;

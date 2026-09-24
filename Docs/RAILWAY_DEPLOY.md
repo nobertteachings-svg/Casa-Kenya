@@ -30,7 +30,8 @@ git commit -m "Prepare Railway deploy with Postgres and Redis"
 git push -u origin main
 ```
 
-Repo: `git@github.com-casa-kenya:nobertteachings-svg/Casa-Kenya.git`
+Repo: `git@github.com-casa-rwanda:nobertteachings-svg/Casa-Kenya.git`  
+(same GitHub account / SSH key as Casa Rwanda — create the **Casa-Kenya** repo first; do not push this tree onto `Casa-Rwanda`)
 
 ---
 
@@ -93,6 +94,8 @@ Still in **casa-backend** → **Variables**, add manually (copy from your local 
 | `WHATSAPP_PHONE_NUMBER_ID` | Meta |
 | `WHATSAPP_VERIFY_TOKEN` | Your secret verify string |
 | `WHATSAPP_BUSINESS_ACCOUNT_ID` | Meta |
+| `WHATSAPP_OTP_TEMPLATE_NAME` | `casa_login_code` (Meta AUTHENTICATION / COPY_CODE) |
+| `WHATSAPP_OTP_TEMPLATE_LANG_EN` | `en` |
 | `ANTHROPIC_API_KEY` | Claude |
 | `CLOUDINARY_CLOUD_NAME` | Optional |
 | `CLOUDINARY_API_KEY` | Optional |

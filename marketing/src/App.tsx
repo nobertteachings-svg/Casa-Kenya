@@ -4,12 +4,17 @@ import LiveStats from "./components/LiveStats";
 import SocialLinks from "./components/SocialLinks";
 import { type Lang, t } from "./i18n";
 
-const WHATSAPP_PHONE = (import.meta.env.VITE_WHATSAPP_PHONE ?? "254700000000").replace(/\D/g, "");
+const WHATSAPP_PHONE = (import.meta.env.VITE_WHATSAPP_PHONE ?? "254182623299").replace(/\D/g, "");
 const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL ?? "hello@casahomeskenya.com";
 const SUPPORT_EMAIL = import.meta.env.VITE_SUPPORT_EMAIL ?? "support@casahomeskenya.com";
+const IOS_APP_URL =
+  import.meta.env.VITE_IOS_APP_URL ?? "https://apps.apple.com/ke/search?term=Casa%20Kenya";
+const ANDROID_APP_URL =
+  import.meta.env.VITE_ANDROID_APP_URL ??
+  "https://play.google.com/store/apps/details?id=com.casahomeskenya.app";
 const WHATSAPP_DIRECT = `https://wa.me/${WHATSAPP_PHONE}`;
-const WHATSAPP_DISPLAY = WHATSAPP_PHONE.startsWith("254") && WHATSAPP_PHONE.length >= 13
-  ? `+234 ${WHATSAPP_PHONE.slice(3, 6)} ${WHATSAPP_PHONE.slice(6, 9)} ${WHATSAPP_PHONE.slice(9)}`
+const WHATSAPP_DISPLAY = WHATSAPP_PHONE.startsWith("254") && WHATSAPP_PHONE.length >= 12
+  ? `+254 ${WHATSAPP_PHONE.slice(3, 6)} ${WHATSAPP_PHONE.slice(6, 9)} ${WHATSAPP_PHONE.slice(9)}`
   : `+${WHATSAPP_PHONE}`;
 
 function whatsAppUrl(message: string): string {
@@ -51,6 +56,51 @@ function WaButton({
   );
 }
 
+function StoreIcon({ store }: { store: "ios" | "android" }) {
+  if (store === "ios") {
+    return (
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M16.7 12.6c0-2.4 2-3.4 2.1-3.5-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.6.9s-1.9-.9-3.1-.8c-1.6.1-3.1 1-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.2 1.7 2.5 3 2.4 1.2-.1 1.6-.7 3.1-.7s1.8.7 3.1.7 2.1-1.2 2.9-2.3c.9-1.3 1.3-2.6 1.3-2.6s-2.6-1-2.6-4.2zM14.6 5.8c.6-.8 1.1-1.9.9-3-.9 0-2 .6-2.6 1.4-.6.7-1.1 1.8-.9 2.9 1 .1 2-.5 2.6-1.3z"
+        />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M3.6 2.3c-.3.2-.6.6-.6 1.1v17.2c0 .5.3.9.6 1.1l9.5-9.7L3.6 2.3zm11.2 6.4 2.3-1.3-9.1-5.3 6.8 6.6zm2.3 8.2-2.3-1.3-6.8 6.6 9.1-5.3zm.8-6.1-2.8 1.6 2.8 1.6 3.3-1.6-3.3-1.6z"
+      />
+    </svg>
+  );
+}
+
+function StoreButtons({
+  iosLabel,
+  androidLabel,
+  variant = "primary",
+}: {
+  iosLabel: string;
+  androidLabel: string;
+  variant?: "primary" | "light";
+}) {
+  const cls = variant === "light" ? "btn btn--store-light" : "btn btn--store";
+  return (
+    <div className="store-row">
+      <a className={cls} href={IOS_APP_URL} target="_blank" rel="noopener noreferrer">
+        <StoreIcon store="ios" />
+        {iosLabel}
+      </a>
+      <a className={cls} href={ANDROID_APP_URL} target="_blank" rel="noopener noreferrer">
+        <StoreIcon store="android" />
+        {androidLabel}
+      </a>
+    </div>
+  );
+}
+
 function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -78,14 +128,14 @@ function Reveal({ children, className = "" }: { children: React.ReactNode; class
 }
 
 export default function App() {
-  const lang: Lang = "en";
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const lang: Lang = "en";
 
-  const c = t(lang);
+  const c = t();
 
   useEffect(() => {
-    document.documentElement.lang = lang;
+    document.documentElement.lang = "en";
   }, []);
 
   useEffect(() => {
@@ -105,6 +155,7 @@ export default function App() {
   const navLinks = [
     { href: "#listings", label: c.nav.listings },
     { href: "#how", label: c.nav.how },
+    { href: "#apps", label: c.nav.apps },
     { href: "#tenants", label: c.nav.tenants },
     { href: "#landlords", label: c.nav.landlords },
     { href: "#faq", label: c.nav.faq },
@@ -117,7 +168,7 @@ export default function App() {
       >
         <div className="container header__inner">
           <a href="#" className="logo-link" onClick={() => setMenuOpen(false)}>
-            <img src="/casa_logo_lockup_horizontal.png" alt="Casa Kenya" className="logo" />
+            <img src="/casa_logo_mark_master_1024.png" alt="Casa Kenya" className="logo" />
           </a>
 
           <nav className="nav nav--desktop" aria-label="Main">
@@ -129,9 +180,9 @@ export default function App() {
           </nav>
 
           <div className="header__actions">
-            <WaButton message={c.wa.tenant} className="header-cta" variant="ghost">
+            <a href="#apps" className="btn btn--ghost header-cta">
               {c.nav.cta}
-            </WaButton>
+            </a>
             <button
               type="button"
               className="menu-toggle"
@@ -153,9 +204,9 @@ export default function App() {
                 {link.label}
               </a>
             ))}
-            <WaButton message={c.wa.tenant} className="nav-mobile__cta">
+            <a href="#apps" className="btn btn--primary nav-mobile__cta" onClick={() => setMenuOpen(false)}>
               {c.nav.cta}
-            </WaButton>
+            </a>
           </nav>
         </div>
       </header>
@@ -172,8 +223,13 @@ export default function App() {
             <h1 className="hero__title">{c.hero.title}</h1>
             <p className="hero__lead">{c.hero.subtitle}</p>
             <div className="hero__actions">
-              <WaButton message={c.wa.tenant}>{c.hero.ctaTenant}</WaButton>
-              <WaButton message={c.wa.landlord} variant="secondary">
+              <a href="#apps" className="btn btn--primary">
+                {c.hero.ctaApp}
+              </a>
+              <WaButton message={c.wa.tenant} variant="secondary">
+                {c.hero.ctaTenant}
+              </WaButton>
+              <WaButton message={c.wa.landlord} variant="ghost">
                 {c.hero.ctaLandlord}
               </WaButton>
             </div>
@@ -181,6 +237,22 @@ export default function App() {
         </section>
 
         <LiveShowcase lang={lang} whatsAppUrl={whatsAppUrl(c.wa.tenant)} />
+
+        <Reveal>
+          <section id="apps" className="section section--tone">
+            <div className="container apps-block">
+              <header className="section-head">
+                <p className="eyebrow">{c.apps.eyebrow}</p>
+                <h2>{c.apps.title}</h2>
+                <p className="section-desc">{c.apps.subtitle}</p>
+              </header>
+              <StoreButtons iosLabel={c.apps.ios} androidLabel={c.apps.android} />
+              <WaButton message={c.wa.tenant} className="apps-block__wa">
+                {c.apps.whatsapp}
+              </WaButton>
+            </div>
+          </section>
+        </Reveal>
 
         <Reveal>
           <section id="how" className="section">
@@ -315,7 +387,14 @@ export default function App() {
               <h2>{c.cta.title}</h2>
               <p>{c.cta.subtitle}</p>
             </div>
-            <WaButton message={c.wa.tenant}>{c.cta.button}</WaButton>
+            <div className="cta-band__actions">
+              <a href="#apps" className="btn btn--store-light">
+                {c.cta.button}
+              </a>
+              <WaButton message={c.wa.tenant} variant="ghost">
+                {c.cta.whatsapp}
+              </WaButton>
+            </div>
           </div>
         </section>
 
@@ -347,8 +426,11 @@ export default function App() {
       <footer className="footer">
         <div className="container footer__grid">
           <div>
-            <img src="/casa_logo_lockup_horizontal.png" alt="Casa Kenya" className="footer__logo" />
+            <img src="/casa_logo_mark_master_1024.png" alt="Casa Kenya" className="footer__logo" />
             <p className="footer__tagline">{c.footer.tagline}</p>
+            <a className="footer__domain" href="https://casahomeskenya.com">
+              {c.footer.domain}
+            </a>
           </div>
           <div className="footer__meta">
             <p className="footer__meta-label">{c.footer.contact}</p>

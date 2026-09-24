@@ -43,7 +43,7 @@ export default function UnlockSheet({
   onClose,
   onUnlocked,
 }: Props) {
-  const lang = "en" as const;
+  const lang = uiLanguage;
   const m = t(lang);
   const { colors } = useCasaTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
@@ -164,10 +164,7 @@ export default function UnlockSheet({
                   onPress={() =>
                     openWhatsApp(
                       phone,
-                      lang === "fr"
-                        ? `Bonjour, je suis intéressé par votre annonce Casa (${unlockedListing.houseId}).`
-                        : `Hello, I'm interested in your Casa listing (${unlockedListing.houseId}).`
-                    )
+                      `Hello, I'm interested in your Casa listing (${unlockedListing.houseId}).`)
                   }
                 >
                   <Ionicons name="logo-whatsapp" size={18} color={colors.onDark} />
@@ -200,8 +197,8 @@ export default function UnlockSheet({
                   <View style={styles.stepBox}>
                     <Text style={styles.stepLabel}>{m.unlockStepPayLabel}</Text>
                     {instructions ? <Text style={styles.instructions}>{instructions}</Text> : null}
-                    <Pressable style={styles.secondaryBtn} onPress={() => void Linking.openURL("tel:*126#")}>
-                      <Text style={styles.secondaryBtnText}>{m.unlockOpenMomo}</Text>
+                    <Pressable style={styles.secondaryBtn} onPress={() => void Linking.openURL("tel:*334#")}>
+                      <Text style={styles.secondaryBtnText}>{m.unlockOpenMpesa}</Text>
                     </Pressable>
                   </View>
                   {quote.moveInCost ? (

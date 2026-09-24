@@ -47,8 +47,8 @@ describe("houses service", () => {
   });
 
   it("builds Google Maps link from coordinates", () => {
-    expect(googleMapsLink(9.0765, 7.3986)).toBe(
-      "https://maps.google.com/?q=9.0765,7.3986"
+    expect(googleMapsLink(-1.2679, 36.8102)).toBe(
+      "https://maps.google.com/?q=-1.2679,36.8102"
     );
   });
 
@@ -70,19 +70,19 @@ describe("houses service", () => {
     expect(summary).toContain("80,000");
   });
 
-  it("formats commercial office listing in French", () => {
+  it("formats commercial office listing in English", () => {
     const summary = formatHouseSummary(
       makeHouse({
         property_category: "commercial",
         property_subtype: "office",
         neighbourhood: "Westlands",
         town: "Nairobi",
-        region: "lagos",
+        region: "nairobi",
       }),
-      "fr"
+      "en"
     );
     expect(summary).toContain("Commercial");
-    expect(summary).toContain("Espace bureau");
+    expect(summary).toContain("Office space");
     expect(summary).toContain("Westlands");
   });
 
@@ -176,12 +176,12 @@ describe("houses service", () => {
         type: "room",
         property_category: "residential",
         property_subtype: "single_room",
-        region: "lagos",
+        region: "nairobi",
         town: "Nairobi",
         rent: 50000,
         months_upfront: 1,
-        latitude: 9.0765,
-        longitude: 7.3986,
+        latitude: -1.2679,
+        longitude: 36.8102,
         neighbourhood: "Westlands",
         videos: [],
       })
@@ -210,7 +210,7 @@ describe("houses service", () => {
       type: "apartment",
       property_category: "commercial",
       property_subtype: "shop",
-      region: "lagos",
+      region: "nairobi",
       town: "Nairobi",
       rent: 150000,
       months_upfront: 2,

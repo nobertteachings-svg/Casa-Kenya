@@ -1,4 +1,4 @@
-import { t, parseRoleChoice } from "../i18n/index.js";
+import { t, parseRoleChoice, normalizeStoredLanguage } from "../i18n/index.js";
 import type { Language } from "../i18n/messages.js";
 import { clearSession, setSession, type FlowState } from "../redis/client.js";
 import { createUser } from "../services/users.js";
@@ -8,41 +8,25 @@ import { menuButtonLabel, roleMenuOptions } from "./menu-options.js";
 
 const DEFAULT_LANG: Language = "en";
 
+async function promptRole(phone: string, lang: Language): Promise<void> {
+  const m = t(lang);
+  await sendMenuMessage(phone, m.chooseRole, roleMenuOptions(lang), menuButtonLabel(lang));
+}
+
 export async function handleRegistration(
   phone: string,
   text: string,
   session: FlowState
 ): Promise<void> {
-  const lang = DEFAULT_LANG;
+  const lang = normalizeStoredLanguage(session.language);
   const m = t(lang);
   const choice = text.trim();
+  const step = session.step === "language" ? "role" : session.step;
 
-  switch (session.step) {
+  switch (step) {
     case "welcome": {
       await sendTextMessage(phone, m.welcome);
-      await sendMenuMessage(
-        phone,
-        m.chooseRole,
-        roleMenuOptions(lang),
-        menuButtonLabel(lang)
-      );
-      await setSession(phone, {
-        flow: "registration",
-        step: "role",
-        language: lang,
-        data: session.data ?? {},
-      });
-      break;
-    }
-
-    // Legacy sessions that still expect a language step
-    case "language": {
-      await sendMenuMessage(
-        phone,
-        m.chooseRole,
-        roleMenuOptions(lang),
-        menuButtonLabel(lang)
-      );
+      await promptRole(phone, lang);
       await setSession(phone, {
         flow: "registration",
         step: "role",
@@ -53,11 +37,7 @@ export async function handleRegistration(
     }
 
     case "role": {
-      if (
-        choice === "3" ||
-        text.toLowerCase().includes("referral") ||
-        text.toLowerCase().includes("parrain")
-      ) {
+      if (choice === "3" || text.toLowerCase().includes("referral")) {
         await setSession(phone, {
           flow: "registration",
           step: "referrer",
@@ -74,21 +54,11 @@ export async function handleRegistration(
       const role = parseRoleChoice(text);
       if (!role) {
         await sendTextMessage(phone, m.invalidChoice);
-        await sendMenuMessage(
-          phone,
-          m.chooseRole,
-          roleMenuOptions(lang),
-          menuButtonLabel(lang)
-        );
+        await promptRole(phone, lang);
         return;
       }
 
-      await createUser(
-        phone,
-        role,
-        lang,
-        session.data.whatsapp_name as string | undefined
-      );
+      await createUser(phone, role, lang, session.data.whatsapp_name as string | undefined);
       const referrer = session.data.referrer as string | undefined;
       if (referrer) {
         const { createReferral } = await import("../services/features/referrals.js");
@@ -108,12 +78,7 @@ export async function handleRegistration(
         language: lang,
         data: { ...session.data, referrer: referrerPhone },
       });
-      await sendMenuMessage(
-        phone,
-        m.chooseRole,
-        roleMenuOptions(lang),
-        menuButtonLabel(lang)
-      );
+      await promptRole(phone, lang);
       break;
     }
 

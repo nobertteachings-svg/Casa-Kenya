@@ -2,7 +2,7 @@
 
 WhatsApp-first housing marketplace for **Kenya** (separate from Casa Nigeria and Casa Cameroon).
 
-> Sibling projects: `../Casa Nigeria`, `../Casa Cameroon` — do not mix env secrets or databases.
+> Sibling projects: `../Casa Rwanda`, `../Casa Nigeria`, `../Casa Cameroon` — do not mix env secrets or databases. GitHub / Expo / Apple follow Casa Rwanda.
 
 See [Docs/CASA_KENYA_SETUP.md](Docs/CASA_KENYA_SETUP.md).
 
@@ -17,7 +17,7 @@ See [Docs/CASA_KENYA_SETUP.md](Docs/CASA_KENYA_SETUP.md).
 <p align="center">Find your home. From any phone. In any neighbourhood in Kenya.</p>
 
 <p align="center">
-  Casa Kenya is a WhatsApp-first housing platform where landlords list properties and tenants search, browse, and unlock landlord contacts — no app download required.
+  Casa Kenya is a housing platform for Kenya. Landlords list and tenants search on the iOS/Android app or WhatsApp, then unlock landlord contacts.
 </p>
 
 ---
@@ -29,9 +29,9 @@ See [Docs/CASA_KENYA_SETUP.md](Docs/CASA_KENYA_SETUP.md).
 | Currency | **KES** |
 | Phone | **+254** |
 | Locations | **47 counties** |
-| Language | English-only (Swahili later) |
+| Language | English |
 | Domain | casahomeskenya.com |
-| Mobile | com.casahomeskenya.app |
+| Mobile | com.casahomeskenya.app (Expo + Apple = Casa Rwanda; Android AAB uploaded manually) |
 | Payments | Off until M-Pesa / Paystack Kenya |
 
 ## Quick Start

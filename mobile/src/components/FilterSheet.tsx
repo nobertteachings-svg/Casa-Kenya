@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import type { Language } from "../api/client";
-import { CAMEROON_REGIONS, regionLabel } from "../constants/regions";
+import { KENYA_COUNTIES, regionLabel } from "../constants/regions";
 import { t } from "../i18n/strings";
 import { radii, spacing, type ColorTokens } from "../theme/casa";
 import { fontFamily } from "../theme/fonts";
@@ -175,7 +175,7 @@ export default function FilterSheet({
           <Text style={styles.label}>{m.searchRegion}</Text>
           <View style={styles.wrap}>
             <Chip label={m.searchAnyRegion} active={!values.regionId} onPress={() => patch({ regionId: "" })} styles={styles} />
-            {CAMEROON_REGIONS.map((r) => (
+            {KENYA_COUNTIES.map((r) => (
               <Chip
                 key={r.id}
                 label={regionLabel(r.id, language)}

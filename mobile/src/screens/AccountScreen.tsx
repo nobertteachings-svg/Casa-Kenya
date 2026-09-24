@@ -48,7 +48,7 @@ export default function AccountScreen({
   contactCount = 0,
   onNeedLogin,
 }: Props) {
-  const lang = "en" as const;
+  const lang = uiLanguage;
   const m = t(lang);
   const isLandlord = user?.role === "landlord";
   const { colors, ui, mode, setMode } = useCasaTheme();
@@ -124,7 +124,7 @@ export default function AccountScreen({
               />
               <AccountActionRow
                 icon="phone-portrait-outline"
-                label={m.tenantVerifyMomo}
+                label={m.tenantVerifyMpesa}
                 onPress={() => void requestTenantVerification(token, "mpesa")}
               />
             </>

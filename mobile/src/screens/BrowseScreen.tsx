@@ -66,7 +66,7 @@ export default function BrowseScreen({
   onCoachDismissed,
   onNeedLogin,
 }: Props) {
-  const lang = "en" as const;
+  const lang = uiLanguage;
   const m = t(lang);
   const online = useNetworkStatus();
   const { colors, ui } = useCasaTheme();

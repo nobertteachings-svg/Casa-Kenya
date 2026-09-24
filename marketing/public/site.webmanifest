@@ -1,11 +1,11 @@
 {
-  "name": "Casa Nigeria",
-  "short_name": "Casa Nigeria",
-  "description": "Find your home on WhatsApp — housing across Nigeria.",
+  "name": "Casa Kenya",
+  "short_name": "Casa Kenya",
+  "description": "Find a home in Kenya — on the Casa Kenya app or WhatsApp.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a2e22",
-  "theme_color": "#1a2e22",
+  "background_color": "#0f2f24",
+  "theme_color": "#1B8E3E",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -15,11 +15,6 @@
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
       "type": "image/png"
     }
   ]

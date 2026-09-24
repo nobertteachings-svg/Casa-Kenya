@@ -71,11 +71,11 @@ This handover covers everything built to date:
 
 Listings are **residential** or **commercial**. Subtype menus are defined in `backend/src/constants/property-taxonomy.ts`.
 
-**Residential subtypes:** `single_room`, `bedsitter`, `studio`, `one_bedroom`, `two_bedroom`, `three_bedroom_plus`, `maisonette`, `bungalow`
+**Residential subtypes:** `single_room`, `double_room`, `bedsitter`, `studio`, `one_bedroom`, `two_bedroom`, `three_bedroom_plus`, `maisonette`, `bungalow`, `servant_quarter`
 
 **Commercial subtypes:** `shop`, `office`, `warehouse`, `restaurant`, `salon`, `workshop`, `showroom`, `commercial_space`
 
-**Location capture order:** state → city (free text) → neighbourhood (free text) → WhatsApp GPS pin.
+**Location capture order:** county → city (free text) → neighbourhood (free text) → WhatsApp GPS pin.
 
 **Electricity:** `electricity_meter` is `none`, `prepaid`, or `postpaid` (replaces legacy boolean `electricity` flag).
 
@@ -284,6 +284,8 @@ All backend services read from the **root** `.env` file (`backend/src/config/env
 | `WHATSAPP_VERIFY_TOKEN` | No | `casa_verify_token` | Webhook verification string |
 | `WHATSAPP_APP_SECRET` | **Prod yes** | — | `X-Hub-Signature-256` validation |
 | `WHATSAPP_BUSINESS_ACCOUNT_ID` | No | — | Meta business account |
+| `WHATSAPP_OTP_TEMPLATE_NAME` | No | `casa_login_code` | Meta AUTHENTICATION / COPY_CODE template |
+| `WHATSAPP_OTP_TEMPLATE_LANG_EN` | No | `en` | English OTP template language |
 | `ANTHROPIC_API_KEY` | For AI flows | — | Claude API key |
 | `CLOUDINARY_CLOUD_NAME` | No | — | Permanent media (fallback: `wa-media:`) |
 | `CLOUDINARY_API_KEY` | No | — | |
@@ -604,7 +606,7 @@ interface FlowState {
 ### 10.3 Registration
 
 **File:** `flows/registration.ts`  
-`welcome → role (landlord/tenant/referred) → main menu` — English-only for Kenya.  
+`welcome → role (landlord/tenant/referred) → main menu`. The product is English only.  
 Menus are tappable (`menu-options.ts`).
 
 ### 10.4 Main Menu

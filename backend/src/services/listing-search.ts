@@ -202,7 +202,7 @@ export function parseAppSearchQuery(q: Record<string, unknown>): AppSearchParams
       ? categoryRaw
       : undefined;
   const langRaw = String(q.lang ?? "").trim();
-  const lang: Language | undefined = langRaw === "fr" || langRaw === "en" ? langRaw : undefined;
+  const lang: Language | undefined = langRaw ? "en" : undefined;
   const meterRaw = String(q.electricityMeter ?? q.meter ?? "").trim();
   const electricityMeter =
     meterRaw === "prepaid" || meterRaw === "postpaid" || meterRaw === "none" ? meterRaw : undefined;

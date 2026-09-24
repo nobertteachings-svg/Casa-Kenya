@@ -1,11 +1,35 @@
 import { env } from "../config/env.js";
 import { redis } from "../redis/client.js";
+import { normalizeKenyaPhone } from "../utils/kenya-phone.js";
 
 export const APP_OTP_TTL_SEC = env.APP_OTP_TTL_SEC;
 export const APP_LOGIN_TRIGGER = "CASA-APP-LOGIN";
 
+/** Digits only, with Kenya 254 prefix when the user typed 07xx / 01xx / 7xxxxxxxx. */
+export function canonicalPhone(raw: string): string {
+  let d = raw.replace(/\D/g, "");
+  if (d.startsWith("00")) d = d.slice(2);
+  return normalizeKenyaPhone(d) ?? d;
+}
+
+export function phoneAliases(raw: string): string[] {
+  const digits = raw.replace(/\D/g, "");
+  const canonical = canonicalPhone(raw);
+  const out = new Set<string>([canonical, digits].filter((p) => p.length >= 7));
+  if (canonical.startsWith("254") && canonical.length === 12) {
+    const national = canonical.slice(3);
+    out.add(national);
+    out.add(`0${national}`);
+  }
+  return [...out];
+}
+
 export function otpKey(phone: string): string {
-  return `casa:login:${phone.replace(/\D/g, "")}`;
+  return `casa:login:${canonicalPhone(phone)}`;
+}
+
+function otpCodeKey(code: string): string {
+  return `casa:login-code:${code.replace(/\D/g, "")}`;
 }
 
 export function generateOTP(): string {
@@ -18,9 +42,8 @@ export function isAppLoginTrigger(text: string): boolean {
   return (
     t.includes("casa-app-login") ||
     t.includes("app login code") ||
-    t.includes("code de connexion") ||
     t.includes("send my app login") ||
-    t.includes("envoyer mon code") ||
+    t.includes("login code") ||
     t === "casa login" ||
     t === "code app"
   );
@@ -31,24 +54,111 @@ export function isPendingOtpFollowup(text: string): boolean {
   const t = text.trim().toLowerCase();
   if (!t) return false;
   if (isAppLoginTrigger(t)) return true;
-  if (["hi", "hello", "bonjour", "salut", "menu", "start"].includes(t)) return true;
-  return /want to sign up|je veux m['’]?inscrire|ouvrir casa/i.test(t);
+  if (["hi", "hello", "menu", "start"].includes(t)) return true;
+  return /want to sign up/i.test(t);
 }
 
-export function appLoginWhatsAppUrl(_lang: "en" | "fr" = "en"): string {
-  const phone = (env.PUBLIC_WHATSAPP_PHONE || "254700000000").replace(/\D/g, "");
-  const text = `${APP_LOGIN_TRIGGER}\nSend this message to get your Casa login code.`;
+export function appLoginWhatsAppUrl(_lang: "en" = "en"): string {
+  const phone = (env.PUBLIC_WHATSAPP_PHONE || "254182623299").replace(/\D/g, "");
+  const text =
+    `${APP_LOGIN_TRIGGER}\nSend this message to get your Casa login code.`;
   return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
 }
 
 export async function peekLoginOtp(phone: string): Promise<string | null> {
-  return redis.get(otpKey(phone.replace(/\D/g, "")));
+  for (const p of phoneAliases(phone)) {
+    const stored = await redis.get(`casa:login:${p}`);
+    if (stored) return stored;
+  }
+  return null;
 }
 
 export async function storeLoginOtp(phone: string, otp: string): Promise<void> {
-  await redis.set(otpKey(phone.replace(/\D/g, "")), otp, "EX", APP_OTP_TTL_SEC);
+  const aliases = phoneAliases(phone);
+  if (aliases.length === 0) return;
+  const digits = otp.replace(/\D/g, "");
+  const pipe = redis.multi();
+  for (const p of aliases) {
+    pipe.set(`casa:login:${p}`, digits, "EX", APP_OTP_TTL_SEC);
+  }
+  if (digits) {
+    pipe.set(otpCodeKey(digits), canonicalPhone(phone), "EX", APP_OTP_TTL_SEC);
+  }
+  await pipe.exec();
 }
 
-export function loginOtpMessage(otp: string, _lang: "en" | "fr"): string {
-  return `🔐 *Casa login code: ${otp}*\n\nValid for ${Math.round(APP_OTP_TTL_SEC / 60)} minutes. Do not share this code.\n\nGo back to the app and enter this code.`;
+export async function rememberOtpRequest(phone: string): Promise<void> {
+  const p = canonicalPhone(phone);
+  if (p.length < 7) return;
+  const now = Date.now();
+  await redis.zadd("casa:login-recent", now, p);
+  await redis.zremrangebyscore("casa:login-recent", 0, now - APP_OTP_TTL_SEC * 1000);
+  await redis.expire("casa:login-recent", APP_OTP_TTL_SEC);
+}
+
+/** Same code for personal vs Business WhatsApp when only one login is in flight. */
+export async function otpForInboundWhatsApp(senderPhone: string): Promise<string> {
+  const existing = await peekLoginOtp(senderPhone);
+  if (existing) {
+    await storeLoginOtp(senderPhone, existing);
+    return existing;
+  }
+
+  const now = Date.now();
+  const windowMs = 3 * 60 * 1000;
+  await redis.zremrangebyscore("casa:login-recent", 0, now - windowMs);
+  const recent = await redis.zrangebyscore("casa:login-recent", now - windowMs, now);
+  const others = recent.filter((p) => canonicalPhone(p) !== canonicalPhone(senderPhone));
+  if (others.length === 1) {
+    const borrowed = await peekLoginOtp(others[0]);
+    if (borrowed) {
+      await storeLoginOtp(senderPhone, borrowed);
+      return borrowed;
+    }
+  }
+
+  const otp = generateOTP();
+  await storeLoginOtp(senderPhone, otp);
+  return otp;
+}
+
+async function clearLoginOtp(phone: string, code: string): Promise<void> {
+  const pipe = redis.multi();
+  for (const q of phoneAliases(phone)) pipe.del(`casa:login:${q}`);
+  const digits = code.replace(/\D/g, "");
+  if (digits) pipe.del(otpCodeKey(digits));
+  await pipe.exec().catch(() => undefined);
+}
+
+export async function consumeLoginOtp(
+  phone: string,
+  code: string
+): Promise<{ status: "ok" | "mismatch" | "missing"; phone?: string }> {
+  const want = code.replace(/\D/g, "");
+  if (want.length < 4) return { status: "missing" };
+
+  for (const p of phoneAliases(phone)) {
+    const stored = await redis.get(`casa:login:${p}`);
+    if (stored && stored.replace(/\D/g, "") === want) {
+      await clearLoginOtp(p, want);
+      return { status: "ok", phone: canonicalPhone(p) };
+    }
+  }
+
+  const owner = await redis.get(otpCodeKey(want));
+  if (owner) {
+    const stored = await peekLoginOtp(owner);
+    if (stored && stored.replace(/\D/g, "") === want) {
+      await clearLoginOtp(owner, want);
+      return { status: "ok", phone: canonicalPhone(owner) };
+    }
+  }
+
+  const anyForPhone = await peekLoginOtp(phone);
+  return { status: anyForPhone ? "mismatch" : "missing" };
+}
+
+export function loginOtpMessage(otp: string, _lang: "en" = "en"): string {
+  const mins = Math.round(APP_OTP_TTL_SEC / 60);
+  return `🔐 *Casa login code: ${otp}*\n\nValid for ${mins} minutes. Do not share this code.\n\nGo back to the app and enter this code.`;
 }

@@ -1,7 +1,8 @@
 import { API_URL } from "../config";
+import { normalizeKenyaPhone } from "../utils/kenya-phone";
 
 export type UserRole = "tenant" | "landlord";
-export type Language = "en" | "fr";
+export type Language = "en";
 
 export interface CasaUser {
   phone: string;
@@ -143,7 +144,7 @@ async function request<T>(
 }
 
 export function normalizePhone(input: string): string {
-  return input.replace(/\D/g, "");
+  return normalizeKenyaPhone(input) ?? input.replace(/\D/g, "");
 }
 
 export async function requestLoginCode(

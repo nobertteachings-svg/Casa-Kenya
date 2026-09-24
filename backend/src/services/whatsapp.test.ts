@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseWebhookPayload } from "../services/whatsapp.js";
+import { parseWebhookPayload, resolveWhatsAppSenderPhone } from "../services/whatsapp.js";
 
 describe("WhatsApp webhook parsing", () => {
   it("returns empty array for invalid payload", () => {
@@ -153,5 +153,62 @@ describe("WhatsApp webhook parsing", () => {
     });
 
     expect(list[0]).toMatchObject({ type: "interactive", text: "3", choiceId: "3" });
+  });
+
+  it("uses contacts.wa_id when messages.from is a LID (WhatsApp vs Business)", () => {
+    const resolved = resolveWhatsAppSenderPhone("123456789012345678", [
+      { wa_id: "254712345678", profile: { name: "Biz" } },
+    ]);
+    expect(resolved.phone).toBe("254712345678");
+
+    const messages = parseWebhookPayload({
+      entry: [
+        {
+          changes: [
+            {
+              value: {
+                contacts: [{ wa_id: "254712345678", profile: { name: "Biz" } }],
+                messages: [
+                  {
+                    from: "123456789012345678",
+                    id: "lid-1",
+                    timestamp: "1",
+                    type: "text",
+                    text: { body: "CASA-APP-LOGIN" },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    });
+    expect(messages[0]?.from).toBe("254712345678");
+  });
+
+  it("canonicalizes a 07 wa_id so it matches the app-entered +254 number", () => {
+    const messages = parseWebhookPayload({
+      entry: [
+        {
+          changes: [
+            {
+              value: {
+                contacts: [{ wa_id: "0712345678" }],
+                messages: [
+                  {
+                    from: "0712345678",
+                    id: "local-1",
+                    timestamp: "1",
+                    type: "text",
+                    text: { body: "CASA-APP-LOGIN" },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    });
+    expect(messages[0]?.from).toBe("254712345678");
   });
 });

@@ -50,7 +50,7 @@ export default function SavedScreen({
   onUnlocked,
   onNeedLogin,
 }: Props) {
-  const lang = "en" as const;
+  const lang = uiLanguage;
   const m = t(lang);
   const { ui } = useCasaTheme();
   const [shortlist, setShortlist] = useState<ShortlistItem[]>([]);

@@ -4,12 +4,12 @@ import { findUser, isUserSuspended, syncWhatsAppDisplayName } from "../services/
 import type { IncomingMessage } from "../services/whatsapp.js";
 import { markAsRead, sendTextMessage } from "../services/transport.js";
 import {
-  generateOTP,
+  canonicalPhone,
   isAppLoginTrigger,
   isPendingOtpFollowup,
   loginOtpMessage,
+  otpForInboundWhatsApp,
   peekLoginOtp,
-  storeLoginOtp,
 } from "../services/app-otp.js";
 import { processVoiceNote } from "../services/features/voice.js";
 import { handleLandlordListing } from "./landlord-listing.js";
@@ -40,7 +40,7 @@ async function resolveMessageText(
 }
 
 export async function routeMessage(message: IncomingMessage): Promise<void> {
-  const phone = message.from;
+  const phone = canonicalPhone(message.from);
   const whatsappName = message.name?.trim();
 
   if (message.id && !message.id.startsWith("sim-")) {
@@ -75,33 +75,27 @@ export async function routeMessage(message: IncomingMessage): Promise<void> {
     return;
   }
 
-  // Casa Kenya is English-only — never prompt for language.
   const lang: Language = "en";
-  if (session && session.language !== "en") {
-    await setSession(phone, { ...session, language: "en" });
-    session.language = "en";
-  }
 
   const { text, type: resolvedType } = await resolveMessageText(message, lang);
   const effectiveType =
     message.type === "location" ? "location" : message.type === "video" ? "video" : message.type === "image" ? "image" : resolvedType;
 
-  const pendingOtp = await peekLoginOtp(phone);
-  if (isAppLoginTrigger(text) || (pendingOtp && isPendingOtpFollowup(text))) {
-    let otp = pendingOtp;
-    if (!otp) {
-      otp = generateOTP();
-      try {
-        await storeLoginOtp(phone, otp);
-      } catch {
-        await sendTextMessage(
-          phone,
-          "Could not create a code right now. Open the Casa app and tap Send code again."
-        );
-        return;
-      }
+  if (
+    isAppLoginTrigger(text) ||
+    (isPendingOtpFollowup(text) && (await peekLoginOtp(phone)))
+  ) {
+    let otp: string;
+    try {
+      otp = await otpForInboundWhatsApp(phone);
+    } catch (err) {
+      console.warn("otpForInboundWhatsApp failed:", err);
+      await sendTextMessage(
+        phone,
+        "Could not create a code right now. Open the Casa app and tap Send code again.");
+      return;
     }
-    await sendTextMessage(phone, loginOtpMessage(otp, "en"));
+    await sendTextMessage(phone, loginOtpMessage(otp, lang));
     return;
   }
 

@@ -86,6 +86,6 @@ export function mpesaPaymentInstructions(
   feeKes: number,
   _lang: Language
 ): string {
-  return `Pay KES ${feeKes.toLocaleString()} via M-Pesa (or Paystack) with reference ${houseId}, then tap "I've paid".`;
+  return `Pay KES ${feeKes.toLocaleString("en-KE")} via M-Pesa with reference ${houseId}, then tap "I've paid".`;
 }
 

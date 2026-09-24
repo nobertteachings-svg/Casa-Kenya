@@ -35,7 +35,7 @@ export async function getRentHeatMapText(area?: string): Promise<string> {
   return `📊 *Rent Heat Map* (anonymized)\n\n${lines.join("\n")}\n\n_Based on ${result.rows.reduce((s, r) => s + parseInt(r.count, 10), 0)} active listings_`;
 }
 
-export async function getMarketTrendReport(lang: "en" | "fr" = "en"): Promise<string> {
+export async function getMarketTrendReport(lang: "en" = "en"): Promise<string> {
   const result = await query<{
     neighbourhood: string;
     current_avg: string;
@@ -66,9 +66,7 @@ export async function getMarketTrendReport(lang: "en" | "fr" = "en"): Promise<st
   );
 
   if (result.rows.length === 0) {
-    return lang === "fr"
-      ? "📈 Tendances du marché : pas assez de données. Revenez le mois prochain !"
-      : "📈 Market trend report: not enough data yet. Check back next month!";
+    return "📈 Market trend report: not enough data yet. Check back next month!";
   }
 
   const lines = result.rows.map((r) => {
@@ -80,7 +78,7 @@ export async function getMarketTrendReport(lang: "en" | "fr" = "en"): Promise<st
   });
 
   const header =
-    lang === "fr" ? "📈 *Tendances loyers du mois*" : "📈 *Monthly Rent Trends*";
+    "📈 *Monthly Rent Trends*";
   return `${header}\n\n${lines.join("\n")}`;
 }
 

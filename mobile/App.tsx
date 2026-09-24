@@ -13,7 +13,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/plus-jakarta-sans";
 import type { CasaUser, Language } from "./src/api/client";
-import { bootstrapSession, getMe, unregisterDeviceTokens } from "./src/api/client";
+import { bootstrapSession, getMe, unregisterDeviceTokens, updateAppLanguage } from "./src/api/client";
 import { registerForPushNotifications } from "./src/notifications/register";
 import { pushInboxItem } from "./src/storage/notification-inbox";
 import { clearAuth, loadAuth } from "./src/storage/auth";
@@ -46,7 +46,7 @@ function AppBody({ fontsLoaded }: { fontsLoaded: boolean }) {
   const [phone, setPhone] = useState("");
   const [user, setUser] = useState<CasaUser | null>(null);
   const [needsSignup, setNeedsSignup] = useState(false);
-  const [uiLanguage, setUiLanguage] = useState<Language>("fr");
+  const [uiLanguage, setUiLanguage] = useState<Language>("en");
   const [pendingListingId, setPendingListingId] = useState<string | null>(null);
   const [showLogin, setShowLogin] = useState(false);
   const notificationSub = useRef<Notifications.Subscription | null>(null);
@@ -92,8 +92,8 @@ function AppBody({ fontsLoaded }: { fontsLoaded: boolean }) {
   useEffect(() => {
     void (async () => {
       try {
-        await saveLanguagePref("en");
-        setUiLanguage("en");
+        const pref = await loadLanguagePref();
+        if (pref) setUiLanguage(pref);
 
         const saved = await loadAuth();
         if (!saved) return;
@@ -102,9 +102,11 @@ function AppBody({ fontsLoaded }: { fontsLoaded: boolean }) {
         setPhone(saved.phone);
         setUser(me.user);
         setNeedsSignup(me.needsSignup);
-        setUiLanguage("en");
+        const nextLang: Language = "en";
+        setUiLanguage(nextLang);
+        await saveLanguagePref(nextLang);
         if (me.needsSignup) {
-          await bootstrapSession(saved.token, "en");
+          await bootstrapSession(saved.token, nextLang);
         }
         void registerForPushNotifications(saved.token);
       } catch {
@@ -121,9 +123,10 @@ function AppBody({ fontsLoaded }: { fontsLoaded: boolean }) {
       setUser(u);
       setNeedsSignup(signup);
       setPhone(savedPhone);
-      setUiLanguage("en");
+      const nextLang: Language = "en";
+      setUiLanguage(nextLang);
       setShowLogin(false);
-      await saveLanguagePref("en");
+      await saveLanguagePref(nextLang);
       void registerForPushNotifications(t);
     },
     []
@@ -136,12 +139,18 @@ function AppBody({ fontsLoaded }: { fontsLoaded: boolean }) {
   }, []);
 
   const handleLanguageChange = useCallback(async (lang: Language) => {
-    setUiLanguage(lang);
-    await saveLanguagePref(lang);
-    if (user?.language !== lang) {
-      // refreshed by AccountScreen after API call
+    const next: Language = "en";
+    setUiLanguage(next);
+    await saveLanguagePref(next);
+    if (token) {
+      try {
+        const res = await updateAppLanguage(token, next);
+        if (res.user) setUser(res.user);
+      } catch {
+        /* keep local preference */
+      }
     }
-  }, [user?.language]);
+  }, [token]);
 
   const handleLogout = useCallback(async () => {
     if (token) {

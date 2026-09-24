@@ -13,7 +13,7 @@ export interface PublicListingCard {
   neighbourhood: string | null;
   city: string | null;
   region: string | null;
-  rentNgn: number | null;
+  rentKes: number | null;
   category: string | null;
   photoUrl: string | null;
 }

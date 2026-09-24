@@ -17,7 +17,7 @@ function getClient(): Anthropic {
 export interface IdScanResult {
   is_valid_id: boolean;
   document_type: string;
-  is_nigeria_document: boolean;
+  is_kenya_document: boolean;
   full_name: string | null;
   id_number: string | null;
   expiry_date: string | null;
@@ -44,7 +44,7 @@ function extractionPrompt(sideHint: string): string {
 
 ${sideHint}
 
-Accept ANY document that clearly shows a person's full name — national ID (National ID), passport, driver's license, receipt, invoice, NEPA/PHCN bill, bank slip, or similar.
+Accept ANY document that clearly shows a person's full name — Kenyan National ID, passport, driver's license, KPLC bill, M-Pesa statement, receipt, invoice, bank slip, or similar.
 Your PRIMARY job is to read the person's full name.
 Also extract ID/document number and expiry date when present (optional — null is fine if absent).
 Do NOT reject because it is a receipt or not a government ID.
@@ -54,8 +54,8 @@ If text is partially readable, still extract what you can.
 Return ONLY valid JSON:
 {
   "is_valid_id": boolean,
-  "document_type": "nin" | "passport" | "drivers_license" | "receipt" | "other" | "not_an_id",
-  "is_nigeria_document": boolean,
+  "document_type": "national_id" | "passport" | "drivers_license" | "receipt" | "other" | "not_an_id",
+  "is_kenya_document": boolean,
   "full_name": string or null,
   "id_number": string or null,
   "expiry_date": "YYYY-MM-DD" or null,
@@ -71,7 +71,8 @@ Rules:
 - expiry_date = optional; null if not present
 - is_expired = true if expiry_date is before today (${new Date().toISOString().slice(0, 10)}); still return the date
 - is_valid_id = true if the image shows a document with a readable personal name (including receipts/bills)
-- document_type = "receipt" for receipts/invoices/bills; "not_an_id" ONLY if there is clearly no personal name and it is not a document
+- document_type = "national_id" for Kenyan National ID / ID card; "receipt" for receipts/invoices/bills; "not_an_id" ONLY if there is clearly no personal name and it is not a document
+- is_kenya_document = true when the document appears Kenyan (National ID, KPLC, M-Pesa, Kenyan passport, etc.)
 - rejection_reason = null unless no personal name can be found at all`;
 }
 
@@ -194,7 +195,7 @@ export function mergeIdScans(...scans: Array<IdScanResult | null | undefined>): 
   return {
     is_valid_id: parts.some((p) => p.is_valid_id) || Boolean(full_name),
     document_type,
-    is_nigeria_document: parts.some((p) => p.is_nigeria_document),
+    is_kenya_document: parts.some((p) => p.is_kenya_document),
     full_name,
     id_number,
     expiry_date,
@@ -214,37 +215,27 @@ export function canFinalizeFromFrontOnly(scan: IdScanResult): boolean {
   return Boolean(scan.full_name?.trim());
 }
 
-export function decideOutcome(scan: IdScanResult, lang: "en" | "fr"): LandlordIdVerificationOutcome {
+export function decideOutcome(scan: IdScanResult, lang: "en"): LandlordIdVerificationOutcome {
   const name = scan.full_name?.trim() || null;
 
   if (!name) {
     return {
       status: "rejected",
       message:
-        lang === "fr"
-          ? "❌ Nom illisible.\n\nRenvoyez *une photo* d'un document où votre *nom* est clairement visible (National ID, passeport, reçu, facture, etc.)."
-          : "❌ Could not read the name.\n\nPlease resend *one photo* of a document where your *name* is clearly visible (National ID, passport, receipt, bill, etc.).",
+        "❌ Could not read the name.\n\nPlease resend *one photo* of a document where your *name* is clearly visible (National ID, passport, receipt, bill, etc.).",
       scan,
     };
   }
 
   const idLine = scan.id_number
-    ? lang === "fr"
-      ? `N° pièce: *${scan.id_number}*\n`
-      : `ID #: *${scan.id_number}*\n`
-    : "";
+    ? `ID #: *${scan.id_number}*\n`: "";
   const expiryLine = scan.expiry_date
-    ? lang === "fr"
-      ? `Expiration: *${scan.expiry_date}*\n`
-      : `Expires: *${scan.expiry_date}*\n`
-    : "";
+    ? `Expires: *${scan.expiry_date}*\n`: "";
 
   return {
     status: "approved",
     message:
-      lang === "fr"
-        ? `✅ Identité vérifiée !\n\nNom: *${name}*\n${idLine}${expiryLine}Vous pouvez maintenant publier des annonces avec le badge *Propriétaire vérifié*.`
-        : `✅ Identity verified!\n\nName: *${name}*\n${idLine}${expiryLine}You can now list properties with the *Verified landlord* badge.`,
+      `✅ Identity verified!\n\nName: *${name}*\n${idLine}${expiryLine}You can now list properties with the *Verified landlord* badge.`,
     scan,
   };
 }
@@ -309,7 +300,7 @@ export async function finalizeLandlordIdVerification(
   frontMediaId: string,
   backMediaId: string | null,
   scan: IdScanResult,
-  lang: "en" | "fr"
+  lang: "en"
 ): Promise<LandlordIdVerificationOutcome> {
   const outcome = decideOutcome(scan, lang);
   await saveVerificationRecord(
@@ -332,16 +323,14 @@ export async function finalizeLandlordIdVerification(
 export async function scanAndVerifyLandlordId(
   landlordPhone: string,
   mediaId: string,
-  lang: "en" | "fr",
+  lang: "en",
   prefetchedImage?: Buffer | null
 ): Promise<LandlordIdVerificationOutcome> {
   if (!isClaudeConfigured) {
     return {
       status: "manual_review",
       message:
-        lang === "fr"
-          ? "⏳ Document reçu. Vérification manuelle (IA non configurée)."
-          : "⏳ Document received. Manual review (AI not configured).",
+        "⏳ Document received. Manual review (AI not configured).",
       scan: null,
     };
   }
@@ -357,9 +346,7 @@ export async function scanAndVerifyLandlordId(
     return {
       status: "manual_review",
       message:
-        lang === "fr"
-          ? "⏳ Document enregistré. Vérification en cours."
-          : "⏳ Document recorded. Verification in progress.",
+        "⏳ Document recorded. Verification in progress.",
       scan: null,
     };
   }
@@ -371,9 +358,7 @@ export async function scanAndVerifyLandlordId(
     return {
       status: "manual_review",
       message:
-        lang === "fr"
-          ? "⏳ Impossible d'analyser le document. Vérification manuelle en cours."
-          : "⏳ Could not analyze document. Manual review in progress.",
+        "⏳ Could not analyze document. Manual review in progress.",
       scan: null,
     };
   }
@@ -404,9 +389,9 @@ export async function isLandlordVerified(phone: string): Promise<boolean> {
   return row?.verified === true && row?.verification_method === "landlord_id";
 }
 
-export function landlordVerifiedBadge(lang: "en" | "fr", verified: boolean): string {
+export function landlordVerifiedBadge(lang: "en", verified: boolean): string {
   if (!verified) return "";
-  return lang === "fr" ? " ✅ Propriétaire vérifié" : " ✅ Verified landlord";
+  return " ✅ Verified landlord";
 }
 
 export async function listPendingIdVerifications(): Promise<
@@ -488,8 +473,8 @@ export async function approveManualIdVerification(
 
   const scan: IdScanResult = row.claude_analysis ?? {
     is_valid_id: true,
-    document_type: "nin",
-    is_nigeria_document: true,
+    document_type: "national_id",
+    is_kenya_document: true,
     full_name: row.full_name,
     id_number: row.id_number,
     expiry_date: row.expiry_date,

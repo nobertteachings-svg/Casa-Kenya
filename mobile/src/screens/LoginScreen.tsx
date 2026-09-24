@@ -11,9 +11,10 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { requestLoginCode, verifyLoginCode, bootstrapSession } from "../api/client";
+import { normalizeKenyaPhone } from "../utils/kenya-phone";
 import { saveAuth } from "../storage/auth";
 import type { CasaUser, Language } from "../api/client";
-import { loginT } from "../i18n/strings";
+import { t } from "../i18n/strings";
 import CasaButton from "../components/CasaButton";
 import CasaLogo from "../components/CasaLogo";
 import { fontFamily } from "../theme/fonts";
@@ -21,7 +22,7 @@ import { radii, spacing, type ColorTokens } from "../theme/casa";
 import { screenInsets } from "../theme/insets";
 import { useCasaTheme } from "../theme/ThemeContext";
 
-const WHATSAPP_SIGNUP = "https://wa.me/254700000000?text=Hi%20Casa!%20I%20want%20to%20sign%20up.";
+const WHATSAPP_SIGNUP = "https://wa.me/254182623299?text=Hi%20Casa!%20I%20want%20to%20sign%20up.";
 const OTP_LEN = 6;
 
 interface Props {
@@ -38,7 +39,8 @@ interface Props {
 export default function LoginScreen({ onLoggedIn, onDismiss }: Props) {
   const { colors, gradient } = useCasaTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
-  const m = loginT(false);
+  const uiLang: Language = "en";
+  const m = t(uiLang);
   const [phone, setPhone] = useState("254");
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -50,17 +52,21 @@ export default function LoginScreen({ onLoggedIn, onDismiss }: Props) {
   const otpRefs = useRef<Array<TextInput | null>>([]);
 
   async function sendCode() {
+    const kenyaPhone = normalizeKenyaPhone(phone);
+    if (!kenyaPhone) {
+      setError(m.invalidKenyaPhone);
+      return;
+    }
     setBusy(true);
     setError("");
     setHint("");
     try {
-      const lang = "en" as const;
-      const res = await requestLoginCode(phone, lang);
+      const lang = uiLang;
+      const res = await requestLoginCode(kenyaPhone, lang);
       if (res.delivery === "existing_user" && res.token) {
-        const normalized = phone.replace(/\D/g, "");
-        await saveAuth(res.token, normalized);
+        await saveAuth(res.token, kenyaPhone);
         await bootstrapSession(res.token, lang);
-        onLoggedIn(res.token, res.user ?? null, res.needsSignup ?? false, normalized, lang);
+        onLoggedIn(res.token, res.user ?? null, res.needsSignup ?? false, kenyaPhone, lang);
         return;
       }
       const mins = Math.round(res.expiresIn / 60);
@@ -83,15 +89,19 @@ export default function LoginScreen({ onLoggedIn, onDismiss }: Props) {
 
   async function verifyWith(codeValue: string) {
     if (codeValue.length < OTP_LEN || busy) return;
+    const kenyaPhone = normalizeKenyaPhone(phone);
+    if (!kenyaPhone) {
+      setError(m.invalidKenyaPhone);
+      return;
+    }
     setBusy(true);
     setError("");
     try {
-      const normalized = phone.replace(/\D/g, "");
-      const lang = "en" as const;
-      const res = await verifyLoginCode(phone, codeValue);
-      await saveAuth(res.token, normalized);
+      const lang = uiLang;
+      const res = await verifyLoginCode(kenyaPhone, codeValue);
+      await saveAuth(res.token, kenyaPhone);
       await bootstrapSession(res.token, lang);
-      onLoggedIn(res.token, res.user, res.needsSignup, normalized, lang);
+      onLoggedIn(res.token, res.user, res.needsSignup, kenyaPhone, lang);
     } catch (e) {
       setError(e instanceof Error ? e.message : m.errorGeneric);
     } finally {
@@ -131,7 +141,7 @@ export default function LoginScreen({ onLoggedIn, onDismiss }: Props) {
             )}
           </View>
           <View style={styles.hero}>
-            <CasaLogo width={200} />
+            <CasaLogo width={96} />
             <Text style={styles.tagline}>{m.loginSubtitle}</Text>
           </View>
         </View>
@@ -150,7 +160,7 @@ export default function LoginScreen({ onLoggedIn, onDismiss }: Props) {
                 value={phone}
                 onChangeText={setPhone}
                 keyboardType="phone-pad"
-                placeholder="254700000000"
+                placeholder="0712345678"
                 placeholderTextColor={colors.mutedLight}
               />
               <Text style={styles.note}>{m.phoneNote}</Text>
@@ -158,7 +168,7 @@ export default function LoginScreen({ onLoggedIn, onDismiss }: Props) {
                 label={m.sendCode}
                 onPress={() => void sendCode()}
                 loading={busy}
-                disabled={phone.replace(/\D/g, "").length < 8}
+                disabled={!normalizeKenyaPhone(phone)}
               />
             </>
           ) : (

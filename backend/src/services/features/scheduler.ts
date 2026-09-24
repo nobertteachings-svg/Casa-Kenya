@@ -43,15 +43,11 @@ async function sendWeeklyPerformancePings(): Promise<void> {
     const active = stats.filter((s) => s.views > 0 || s.unlocks > 0);
     if (active.length === 0) continue;
 
-    const lang = landlord.language === "fr" ? "fr" : "en";
     const header =
-      lang === "fr" ? "📊 *Performance de vos annonces cette semaine:*\n" : "📊 *Your listing performance this week:*\n";
+      "📊 *Your listing performance this week:*\n";
     const lines = active
       .map((s) =>
-        lang === "fr"
-          ? `• *${s.house_id}*: ${s.views} vues, ${s.unlocks} déblocages`
-          : `• *${s.house_id}*: ${s.views} views, ${s.unlocks} unlocks`
-      )
+        `• *${s.house_id}*: ${s.views} views, ${s.unlocks} unlocks`)
       .join("\n");
 
     await sendTextMessage(landlord.phone, header + lines);

@@ -16,11 +16,11 @@ export interface DashboardStats {
   };
   revenue: {
     totalUnlocks: number;
-    totalEarningsNgn: number;
+    totalEarningsKes: number;
     unlocksToday: number;
-    earningsTodayNgn: number;
+    earningsTodayKes: number;
     unlocksThisMonth: number;
-    earningsThisMonthNgn: number;
+    earningsThisMonthKes: number;
     unlockFeeKes: number;
   };
   moderation: { pendingReviews: number };
@@ -225,7 +225,7 @@ export interface PublicListingCard {
   neighbourhood: string | null;
   city: string | null;
   region: string | null;
-  rentNgn: number | null;
+  rentKes: number | null;
   category: string | null;
   photoUrl: string | null;
 }

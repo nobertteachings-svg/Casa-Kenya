@@ -9,8 +9,8 @@ import {
 function scan(overrides: Partial<IdScanResult> = {}): IdScanResult {
   return {
     is_valid_id: true,
-    document_type: "nin",
-    is_nigeria_document: true,
+    document_type: "national_id",
+    is_kenya_document: true,
     full_name: "Jean Dupont",
     id_number: "123",
     expiry_date: "2030-01-01",
@@ -67,7 +67,7 @@ describe("mergeIdScans", () => {
 
 describe("canFinalizeFromFrontOnly", () => {
   it("allows any document with a readable name", () => {
-    expect(canFinalizeFromFrontOnly(scan({ document_type: "nin" }))).toBe(true);
+    expect(canFinalizeFromFrontOnly(scan({ document_type: "national_id" }))).toBe(true);
     expect(canFinalizeFromFrontOnly(scan({ document_type: "other" }))).toBe(true);
     expect(canFinalizeFromFrontOnly(scan({ document_type: "passport" }))).toBe(true);
   });

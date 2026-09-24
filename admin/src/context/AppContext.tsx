@@ -48,7 +48,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const setLang = (_l: Lang) => {
-    /* Casa Kenya is English-only */
+    /* Admin dashboard stays English */
   };
 
   const refreshBadges = useCallback(async () => {

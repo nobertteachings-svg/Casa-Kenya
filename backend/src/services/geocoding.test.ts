@@ -21,13 +21,13 @@ describe("forwardGeocode", () => {
       vi.fn().mockResolvedValue({
         ok: true,
         json: async () => [
-          { lat: "3.8480", lon: "11.5021", display_name: "Westlands, Nairobi, Kenya" },
+          { lat: "-1.2676", lon: "36.8108", display_name: "Westlands, Nairobi, Kenya" },
         ],
       })
     );
 
     const result = await forwardGeocode("Westlands, Nairobi");
-    expect(result).toMatchObject({ latitude: 3.848, longitude: 11.5021 });
+    expect(result).toMatchObject({ latitude: -1.2676, longitude: 36.8108 });
   });
 
   it("returns null when geocoder finds nothing", async () => {

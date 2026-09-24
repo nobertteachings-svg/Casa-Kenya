@@ -121,9 +121,7 @@ export async function sendHouseListingMedia(
 
   let sentSummary = false;
   const videoCaption =
-    lang === "fr"
-      ? `🎥 Vidéo du logement — ${house.house_id}`
-      : `🎥 Property video — ${house.house_id}`;
+    `🎥 Property video — ${house.house_id}`;
 
   for (const ref of videos) {
     const ok = await sendMediaRef(phone, ref, "video", sentSummary ? videoCaption : summary);

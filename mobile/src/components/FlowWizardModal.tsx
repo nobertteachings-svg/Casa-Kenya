@@ -17,7 +17,7 @@ import ScreenLoader from "./ScreenLoader";
 import type { CasaUser, Language, SessionInfo, UIAction } from "../api/client";
 import { sendAppMessage, startLandlordVerification, uploadMedia } from "../api/client";
 import OptionGrid, { ChipRow } from "./OptionGrid";
-import { CAMEROON_REGIONS, regionLabel } from "../constants/regions";
+import { KENYA_COUNTIES, regionLabel } from "../constants/regions";
 import {
   MAJOR_TOWNS,
   MONTHS_UPFRONT_OPTIONS,
@@ -127,7 +127,7 @@ export default function FlowWizardModal({
   onUserUpdate,
   onComplete,
 }: Props) {
-  const lang = "en" as const;
+  const lang = uiLanguage;
   const m = t(lang);
   const { colors, gradient } = useCasaTheme();
   const styles = useMemo(() => makeWizardStyles(colors), [colors]);
@@ -495,7 +495,7 @@ export default function FlowWizardModal({
             <OptionGrid
               disabled={locked}
               selectedId={whatForm.subtypeId}
-              options={list.map((s) => ({ id: s.id, label: lang === "fr" ? s.fr : s.en }))}
+              options={list.map((s) => ({ id: s.id, label: s.en}))}
               onSelect={(id) => setWhatForm((s) => ({ ...s, subtypeId: id }))}
             />
             {needsCounts ? (
@@ -558,7 +558,7 @@ export default function FlowWizardModal({
             <OptionGrid
               disabled={locked}
               selectedId={whereForm.regionId}
-              options={CAMEROON_REGIONS.map((r, i) => ({
+              options={KENYA_COUNTIES.map((r, i) => ({
                 id: String(i + 1),
                 label: regionLabel(r.id, lang),
               }))}
@@ -569,7 +569,7 @@ export default function FlowWizardModal({
               style={styles.textInput}
               value={whereForm.town}
               onChangeText={(town) => setWhereForm((s) => ({ ...s, town }))}
-              placeholder={lang === "fr" ? "Nairobi, Nairobi…" : "Nairobi, Nairobi…"}
+              placeholder={"Nairobi, Nairobi…"}
               placeholderTextColor={colors.mutedLight}
             />
             {MAJOR_TOWNS.length > 0 ? (
@@ -585,7 +585,7 @@ export default function FlowWizardModal({
               style={styles.textInput}
               value={whereForm.quarter}
               onChangeText={(quarter) => setWhereForm((s) => ({ ...s, quarter }))}
-              placeholder={lang === "fr" ? "Westlands, Kilimani…" : "Westlands, Kilimani…"}
+              placeholder={"Westlands, Kilimani…"}
               placeholderTextColor={colors.mutedLight}
             />
             {whereForm.town ? (
@@ -682,7 +682,7 @@ export default function FlowWizardModal({
         return (
           <OptionGrid
             disabled={locked}
-            options={CAMEROON_REGIONS.map((r, i) => ({
+            options={KENYA_COUNTIES.map((r, i) => ({
               id: String(i + 1),
               label: regionLabel(r.id, lang),
             }))}
@@ -695,7 +695,7 @@ export default function FlowWizardModal({
           m.searchTown,
           townInput,
           setTownInput,
-          lang === "fr" ? "Nairobi, Mombasa, Kisumu…" : "Nairobi, Mombasa, Kisumu…",
+          "Nairobi, Mombasa, Kisumu…",
           MAJOR_TOWNS.map((town) => ({ id: town, label: town }))
         );
       }
@@ -705,7 +705,7 @@ export default function FlowWizardModal({
           m.searchNeighbourhood,
           quarterInput,
           setQuarterInput,
-          lang === "fr" ? "Westlands, Nyali, Milimani…" : "Westlands, Nyali, Milimani…",
+          "Westlands, Nyali, Milimani…",
           town ? neighbourhoodsForTown(town).map((n) => ({ id: n, label: n })) : []
         );
       }
@@ -743,7 +743,7 @@ export default function FlowWizardModal({
                         onPress={() => setAmenityForm((s) => ({ ...s, electricity_meter: o.id }))}
                       >
                         <Text style={[styles.meterChipText, amenityForm.electricity_meter === o.id && styles.meterChipTextOn]}>
-                          {lang === "fr" ? o.fr : o.en}
+                          {o.en}
                         </Text>
                       </Pressable>
                     ))}
@@ -775,7 +775,7 @@ export default function FlowWizardModal({
         return (
           <OptionGrid
             disabled={locked}
-            options={list.map((s) => ({ id: s.id, label: lang === "fr" ? s.fr : s.en }))}
+            options={list.map((s) => ({ id: s.id, label: s.en}))}
             onSelect={(id) => void pickChoice(id)}
           />
         );

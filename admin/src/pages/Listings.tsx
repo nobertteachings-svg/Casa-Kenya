@@ -5,7 +5,7 @@ import { Drawer } from "../components/Drawer";
 import { MediaImage } from "../components/MediaImage";
 import { RiskBadge } from "../components/RiskBadge";
 import type { HouseDetail, HouseRow, ListingAiReview } from "../types";
-import { formatNgn, statusClass } from "../utils";
+import { formatKes, statusClass } from "../utils";
 
 export default function Listings() {
   const [searchParams] = useSearchParams();
@@ -176,7 +176,7 @@ export default function Listings() {
                     <td><code>{house.house_id}</code></td>
                     <td>{house.landlord_phone}</td>
                     <td>{house.property_subtype?.replace(/_/g, " ") ?? house.type}</td>
-                    <td>{formatNgn(house.rent)}</td>
+                    <td>{formatKes(house.rent)}</td>
                     <td>{house.neighbourhood ?? house.city ?? "—"}</td>
                     <td><span className={statusClass(house.status)}>{house.status.replace("_", " ")}</span></td>
                     <td>{house.review_count > 0 ? house.review_count : "—"}</td>
@@ -200,7 +200,7 @@ export default function Listings() {
         {selected && h && (
           <div className="house-detail">
             {selected.risk && <RiskBadge risk={selected.risk} />}
-            <p><strong>{formatNgn(h.rent)}</strong>/mo · {h.property_category} / {h.property_subtype?.replace(/_/g, " ")}</p>
+            <p><strong>{formatKes(h.rent)}</strong>/mo · {h.property_category} / {h.property_subtype?.replace(/_/g, " ")}</p>
             <p>{h.region} → {h.town ?? h.city} → {h.neighbourhood}</p>
             <p>Electricity: {h.electricity_meter ?? "—"} · Trust: {h.trust_tier ?? "standard"}</p>
             <p>

@@ -26,8 +26,8 @@ interface Props {
   onLanguageChange: (lang: Language) => void;
 }
 
-export default function SignupScreen({ token, onComplete }: Props) {
-  const m = t("en");
+export default function SignupScreen({ token, uiLanguage, onComplete }: Props) {
+  const m = t(uiLanguage);
   const { colors, gradient } = useCasaTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [referral, setReferral] = useState("");
@@ -43,7 +43,7 @@ export default function SignupScreen({ token, onComplete }: Props) {
     try {
       const res = await registerAccount(token, {
         role: picked,
-        language: "en",
+        language: uiLanguage,
         referrer: referral.replace(/\D/g, "") || undefined,
       });
       onComplete(res.user);
@@ -59,7 +59,7 @@ export default function SignupScreen({ token, onComplete }: Props) {
       <LinearGradient colors={[...gradient.header]} style={[styles.header, { paddingTop: screenInsets().top }]}>
         <View>
           <View style={styles.headerRow}>
-            <CasaLogo width={168} />
+            <CasaLogo width={80} />
           </View>
         </View>
       </LinearGradient>
@@ -121,7 +121,7 @@ export default function SignupScreen({ token, onComplete }: Props) {
                 value={referral}
                 onChangeText={setReferral}
                 keyboardType="phone-pad"
-                placeholder="254…"
+                placeholder="0712…"
                 placeholderTextColor={colors.mutedLight}
               />
             </>

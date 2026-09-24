@@ -141,11 +141,10 @@ a {
 }
 
 .logo {
-  /* Match header WhatsApp control height (~ghost btn / menu toggle). */
   height: 42px;
-  width: auto;
-  /* Keep brand green visible — lockup already has a dark ground. */
-  filter: none;
+  width: 42px;
+  object-fit: contain;
+  border-radius: 10px;
 }
 
 .nav--desktop {
@@ -334,7 +333,7 @@ a {
   inset: 0;
   background:
     linear-gradient(120deg, rgba(9, 28, 22, 0.2), transparent 40%),
-    url("/casa_og.png") center / cover no-repeat;
+    url("/casa_feature_graphic_1024x500.png") center / cover no-repeat;
   transform: scale(1.06);
   animation: hero-drift 18s ease-in-out infinite alternate;
 }
@@ -417,6 +416,66 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.store-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.btn--store,
+.btn--store-light {
+  background: var(--forest);
+  color: #fff;
+}
+
+.btn--store:hover {
+  background: var(--leaf);
+}
+
+.btn--store-light {
+  background: #fff;
+  color: var(--forest-deep);
+}
+
+.btn--store-light:hover {
+  background: #e7eee9;
+}
+
+.apps-block {
+  text-align: center;
+}
+
+.apps-block .section-desc {
+  margin-inline: auto;
+}
+
+.apps-block .store-row {
+  margin-top: 1.75rem;
+}
+
+.apps-block__wa {
+  margin-top: 1rem !important;
+}
+
+.cta-band__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.footer__domain {
+  display: inline-block;
+  margin-top: 0.65rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.footer__domain:hover {
+  color: #fff;
 }
 
 /* Showcase */
@@ -958,10 +1017,11 @@ a {
 }
 
 .footer__logo {
-  height: 26px;
+  height: 40px;
+  width: 40px;
+  object-fit: contain;
+  border-radius: 10px;
   margin-bottom: 0.9rem;
-  filter: brightness(0) invert(1);
-  opacity: 0.92;
 }
 
 .footer__tagline {

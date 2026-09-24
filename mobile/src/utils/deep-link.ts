@@ -8,7 +8,7 @@ export function parseListingIdFromUrl(url: string): string | null {
     const parsed = Linking.parse(url);
     const path = (parsed.path ?? "").replace(/^\//, "");
 
-    // casacm://listing/CASA-1234 or exp://…/--/listing/CASA-1234
+    // casake://listing/CASA-1234 or exp://…/--/listing/CASA-1234
     const listingMatch = path.match(/^listing\/?(.+)$/i);
     if (listingMatch?.[1]) {
       return normalizeHouseId(listingMatch[1]);

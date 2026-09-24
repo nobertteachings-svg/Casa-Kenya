@@ -58,7 +58,8 @@ export default function LiveStats({ lang }: { lang: Lang }) {
           {stats && (
             <time className="metrics__time" dateTime={stats.updatedAt}>
               {c.stats.updated}{" "}
-              {new Date(stats.updatedAt).toLocaleTimeString(lang === "fr" ? "fr-FR" : "en-GB", {
+              {new Date(stats.updatedAt).toLocaleTimeString("en-KE", {
+                timeZone: "Africa/Nairobi",
                 hour: "2-digit",
                 minute: "2-digit",
               })}

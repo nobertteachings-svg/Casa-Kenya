@@ -21,7 +21,7 @@ describe("users service", () => {
           phone: "2548000000001",
           role: "tenant",
           language: "en",
-          display_name: "Ada Obi",
+          display_name: "Wanjiku Otieno",
           created_at: new Date(),
         },
       ],
@@ -31,9 +31,9 @@ describe("users service", () => {
       fields: [],
     });
 
-    const user = await createUser("2548000000001", "tenant", "en", "Ada Obi");
-    expect(user.display_name).toBe("Ada Obi");
-    expect(mockedQuery.mock.calls[0][1]).toContain("Ada Obi");
+    const user = await createUser("2548000000001", "tenant", "en", "Wanjiku Otieno");
+    expect(user.display_name).toBe("Wanjiku Otieno");
+    expect(mockedQuery.mock.calls[0][1]).toContain("Wanjiku Otieno");
   });
 
   it("syncWhatsAppDisplayName only fills empty display names", async () => {
@@ -45,9 +45,9 @@ describe("users service", () => {
       fields: [],
     });
 
-    await syncWhatsAppDisplayName("2548000000001", "Chinedu");
+    await syncWhatsAppDisplayName("2548000000001", "Kamau");
 
     expect(mockedQuery.mock.calls[0][0]).toMatch(/display_name IS NULL/);
-    expect(mockedQuery.mock.calls[0][1]).toEqual(["2548000000001", "Chinedu"]);
+    expect(mockedQuery.mock.calls[0][1]).toEqual(["2548000000001", "Kamau"]);
   });
 });

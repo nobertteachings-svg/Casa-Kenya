@@ -87,7 +87,7 @@ export default function LandlordListingsScreen({
   showCoach = false,
   onCoachDismissed,
 }: Props) {
-  const lang = "en" as const;
+  const lang = uiLanguage;
   const m = t(lang);
   const { ui, colors } = useCasaTheme();
   const styles = useMemo(() => makeLandlordStyles(colors), [colors]);

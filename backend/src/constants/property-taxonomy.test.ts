@@ -44,8 +44,11 @@ describe("property taxonomy", () => {
 
   it("parses residential subtypes by menu index", () => {
     expect(parseSubtypeChoice("1", "residential")).toBe("single_room");
-    expect(parseSubtypeChoice("3", "residential")).toBe("studio");
-    expect(parseSubtypeChoice("8", "residential")).toBe("bungalow");
+    expect(parseSubtypeChoice("2", "residential")).toBe("double_room");
+    expect(parseSubtypeChoice("3", "residential")).toBe("bedsitter");
+    expect(parseSubtypeChoice("4", "residential")).toBe("studio");
+    expect(parseSubtypeChoice("9", "residential")).toBe("bungalow");
+    expect(parseSubtypeChoice("10", "residential")).toBe("servant_quarter");
     expect(parseSubtypeChoice("99", "residential")).toBeNull();
   });
 
@@ -55,22 +58,24 @@ describe("property taxonomy", () => {
     expect(parseSubtypeChoice("4", "commercial")).toBe("restaurant");
     expect(parseSubtypeChoice("8", "commercial")).toBe("commercial_space");
     expect(COMMERCIAL_SUBTYPES).toHaveLength(8);
-    expect(RESIDENTIAL_SUBTYPES).toHaveLength(8);
+    expect(RESIDENTIAL_SUBTYPES).toHaveLength(10);
   });
 
   it("maps subtypes to legacy house type column", () => {
     expect(legacyTypeFromSubtype("single_room")).toBe("room");
+    expect(legacyTypeFromSubtype("double_room")).toBe("room");
     expect(legacyTypeFromSubtype("bedsitter")).toBe("room");
+    expect(legacyTypeFromSubtype("servant_quarter")).toBe("room");
     expect(legacyTypeFromSubtype("two_bedroom")).toBe("apartment");
     expect(legacyTypeFromSubtype("studio")).toBe("apartment");
     expect(legacyTypeFromSubtype("office")).toBe("apartment");
     expect(legacyTypeFromSubtype("shop")).toBe("apartment");
   });
 
-  it("labels subtypes and categories in EN and FR", () => {
+  it("labels subtypes and categories in English", () => {
     expect(subtypeLabel("office", "en")).toContain("Office");
-    expect(subtypeLabel("shop", "fr")).toContain("Boutique");
-    expect(categoryLabel("residential", "fr")).toBe("Résidentiel");
+    expect(subtypeLabel("shop", "en")).toContain("Shop");
+    expect(categoryLabel("residential", "en")).toBe("Residential");
     expect(categoryLabel("commercial", "en")).toBe("Commercial");
   });
 
@@ -87,5 +92,7 @@ describe("property taxonomy", () => {
     expect(electricityMeterLabel("postpaid", "en")).toContain("Postpaid");
     expect(subtypeLabel("bedsitter", "en")).toContain("Bedsitter");
     expect(subtypeLabel("maisonette", "en")).toContain("Maisonette");
+    expect(subtypeLabel("servant_quarter", "en")).toContain("Servant quarter");
+    expect(subtypeLabel("double_room", "en")).toContain("Double room");
   });
 });

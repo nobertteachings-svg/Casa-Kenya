@@ -71,17 +71,23 @@ export function formatCount(n: number): string {
   return n.toLocaleString();
 }
 
-export function formatRent(amount: number, lang: "en" | "fr"): string {
-  const locale = lang === "fr" ? "fr-FR" : "en-GB";
-  return `${amount.toLocaleString(locale)} KES`;
+export function formatRent(amount: number, _lang?: "en"): string {
+  return `${amount.toLocaleString("en-KE")} KES`;
 }
 
-export function propertyLabel(type: string, lang: "en" | "fr"): string {
-  const labels: Record<string, { en: string; fr: string }> = {
-    room: { en: "Room", fr: "Chambre" },
-    apartment: { en: "Apartment", fr: "Appartement" },
-    villa: { en: "Villa", fr: "Villa" },
-    studio: { en: "Studio", fr: "Studio" },
+export function propertyLabel(type: string, _lang?: "en"): string {
+  const labels: Record<string, string> = {
+    room: "Room",
+    bedsitter: "Bedsitter",
+    studio: "Studio",
+    one_bedroom: "1 bedroom",
+    two_bedroom: "2 bedroom",
+    maisonette: "Maisonette",
+    bungalow: "Bungalow",
+    servant_quarter: "Servant quarter",
+    apartment: "Apartment",
+    shop: "Shop",
+    office: "Office",
   };
-  return labels[type]?.[lang] ?? type;
+  return labels[type] ?? type.replace(/_/g, " ");
 }

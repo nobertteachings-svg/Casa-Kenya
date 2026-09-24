@@ -204,7 +204,7 @@ CREATE TABLE listing_views (
 
 ### 11. Tenant Trust Badge
 
-**What:** Light verification (ID photo or Paystack-linked KYC). Landlords see "✅ Verified tenant" before engaging.
+**What:** Light verification (National ID photo or M-Pesa-linked KYC). Landlords see "✅ Verified tenant" before engaging.
 
 **Why:** Cuts scam risk both ways; landlords more willing to respond.
 
@@ -214,7 +214,7 @@ CREATE TABLE listing_views (
 ```sql
 ALTER TABLE users ADD COLUMN verified BOOLEAN DEFAULT FALSE;
 ALTER TABLE users ADD COLUMN verified_at TIMESTAMPTZ;
-ALTER TABLE users ADD COLUMN verification_method VARCHAR(30); -- 'id', 'paystack', 'manual'
+ALTER TABLE users ADD COLUMN verification_method VARCHAR(30); -- 'id', 'mpesa', 'manual'
 ```
 
 **Effort:** Large | **Wave:** 3 | **Priority:** Medium
@@ -349,7 +349,7 @@ flowchart TD
 ```
 
 **Hard blockers before any Wave 1+ feature:**
-1. Payment verification (Paystack/Flutterwave)
+1. Payment verification (M-Pesa Daraja)
 2. `unlocks` table populated on real payment
 3. Cloudinary photo pipeline (for trust features)
 

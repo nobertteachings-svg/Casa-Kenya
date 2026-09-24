@@ -4,11 +4,11 @@
  *
  * Usage:
  *   node mobile/scripts/generate-assetlinks.mjs
- *   PLAY_APP_SIGNational IDG_SHA256="AA:BB:..." node mobile/scripts/generate-assetlinks.mjs
+ *   PLAY_APP_SIGNING_SHA256="AA:BB:..." node mobile/scripts/generate-assetlinks.mjs
  *
  * Fingerprints:
  * - EAS upload key (from latest production AAB): always included
- * - Play App signing key: set PLAY_APP_SIGNational IDG_SHA256 from Play Console →
+ * - Play App signing key: set PLAY_APP_SIGNING_SHA256 from Play Console →
  *   Setup → App integrity → App signing key certificate (required for Play installs)
  */
 
@@ -65,8 +65,8 @@ function extractFromLatestAab() {
 }
 
 const uploadSha256 = extractFromLatestAab();
-const playSha256 = process.env.PLAY_APP_SIGNational IDG_SHA256
-  ? normalizeSha256(process.env.PLAY_APP_SIGNational IDG_SHA256)
+const playSha256 = process.env.PLAY_APP_SIGNING_SHA256
+  ? normalizeSha256(process.env.PLAY_APP_SIGNING_SHA256)
   : null;
 
 const fingerprints = unique([playSha256, uploadSha256].filter(Boolean));
@@ -96,6 +96,6 @@ if (!playSha256) {
   console.log(
     "Note: Add Play App signing SHA-256 for Play Store installs:\n" +
       "  Play Console → Setup → App integrity → App signing key certificate\n" +
-      '  PLAY_APP_SIGNational IDG_SHA256="..." node mobile/scripts/generate-assetlinks.mjs',
+      '  PLAY_APP_SIGNING_SHA256="..." node mobile/scripts/generate-assetlinks.mjs',
   );
 }

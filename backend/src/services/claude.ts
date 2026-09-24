@@ -51,7 +51,7 @@ export interface ParsedSearch {
 
 export async function parseListingFromText(
   text: string,
-  language: "en" | "fr"
+  language: "en"
 ): Promise<ParsedListing | null> {
   if (!isClaudeConfigured) return null;
 
@@ -64,7 +64,7 @@ export async function parseListingFromText(
         content: `Extract a Kenya rental listing from this landlord message. Language: ${language}.
 Return ONLY valid JSON with keys:
 - property_category: "residential" or "commercial"
-- property_subtype: one of single_room, bedsitter, studio, one_bedroom, two_bedroom, three_bedroom_plus, maisonette, bungalow (residential) OR shop, office, warehouse, restaurant, salon, workshop, showroom, commercial_space (commercial)
+- property_subtype: one of single_room, double_room, bedsitter, studio, one_bedroom, two_bedroom, three_bedroom_plus, maisonette, bungalow, servant_quarter (residential) OR shop, office, warehouse, restaurant, salon, workshop, showroom, commercial_space (commercial)
 - rent (number KES/month), months_upfront (number)
 - region (Kenya county id — one of: ${kenyaCountyIdsForPrompt()}; e.g. nairobi, mombasa, kiambu)
 - town, neighbourhood (quarter)
@@ -89,7 +89,7 @@ Message: "${text}"`,
 
 export async function parseSearchFromText(
   text: string,
-  language: "en" | "fr"
+  language: "en"
 ): Promise<ParsedSearch> {
   if (!isClaudeConfigured) {
     return { raw_query: text };
@@ -105,7 +105,7 @@ export async function parseSearchFromText(
 Return ONLY valid JSON with optional keys: property_category (residential|commercial), property_subtype, max_rent, region, town, neighbourhood, city, water, parking, electricity_meter (none|prepaid|postpaid), furnished, fenced, borehole, standby_generator, raw_query.
 
 region must be a Kenya county id when present (one of: ${kenyaCountyIdsForPrompt()}; e.g. nairobi, mombasa).
-Residential subtypes: single_room, bedsitter, studio, one_bedroom, two_bedroom, three_bedroom_plus, maisonette, bungalow. Prefer Kenyan terms (bedsitter, maisonette) over Nigerian parlour/self-contain wording.
+Residential subtypes: single_room, double_room, bedsitter, studio, one_bedroom, two_bedroom, three_bedroom_plus, maisonette, bungalow, servant_quarter. Prefer Kenyan terms (bedsitter, maisonette) over Nigerian parlour/self-contain wording.
 Commercial subtypes: shop, office, warehouse, restaurant, salon, workshop, showroom, commercial_space.
 
 Message: "${text}"`,
@@ -126,7 +126,7 @@ Message: "${text}"`,
 
 export async function compareHouses(
   houses: Array<{ house_id: string; type: string; rent: number; distance_km?: number; facilities: string }>,
-  lang: "en" | "fr"
+  lang: "en"
 ): Promise<string> {
   if (!isClaudeConfigured) {
     return houses
@@ -155,16 +155,14 @@ Listings: ${JSON.stringify(houses)}`,
 export async function suggestPriceAdjustment(
   house: { house_id: string; rent: number; neighbourhood: string | null; type: string },
   areaAvgRent: number,
-  lang: "en" | "fr"
+  lang: "en"
 ): Promise<string> {
   if (!isClaudeConfigured) {
     const diff = house.rent - areaAvgRent;
     if (diff > 0) {
-      return lang === "fr"
-        ? `Votre loyer est ${diff.toLocaleString()} KES au-dessus de la moyenne du quartier. Envisagez une baisse.`
-        : `Your rent is ${diff.toLocaleString()} KES above area average. Consider lowering.`;
+      return `Your rent is ${diff.toLocaleString()} KES above area average. Consider lowering.`;
     }
-    return lang === "fr" ? "Votre prix semble compétitif." : "Your price looks competitive.";
+    return "Your price looks competitive.";
   }
 
   const response = await getClient().messages.create({
@@ -194,12 +192,10 @@ export async function generateRentalAgreement(
     landlord_phone: string;
   },
   tenantPhone: string,
-  lang: "en" | "fr"
+  lang: "en"
 ): Promise<string> {
   if (!isClaudeConfigured) {
-    return lang === "fr"
-      ? `CONTRAT DE BAIL — ${house.house_id}\nPropriétaire: ${house.landlord_phone}\nLocataire: ${tenantPhone}\nLoyer: ${house.rent} KES/mois\nCaution: ${house.months_upfront} mois`
-      : `RENTAL AGREEMENT — ${house.house_id}\nLandlord: ${house.landlord_phone}\nTenant: ${tenantPhone}\nRent: ${house.rent} KES/month\nDeposit: ${house.months_upfront} months`;
+    return `RENTAL AGREEMENT — ${house.house_id}\nLandlord: ${house.landlord_phone}\nTenant: ${tenantPhone}\nRent: ${house.rent} KES/month\nDeposit: ${house.months_upfront} months`;
   }
 
   const response = await getClient().messages.create({
@@ -223,7 +219,7 @@ Include standard Kenya rental clauses. Format for WhatsApp.`,
 
 export async function transcribeVoiceNote(
   audioDescription: string,
-  lang: "en" | "fr"
+  lang: "en"
 ): Promise<string | null> {
   if (!isClaudeConfigured) return null;
 

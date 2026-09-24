@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Casa Kenya",
-    "slug": "casa-kenya",
+    "slug": "nobertteachings",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -108,9 +108,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "REPLACE_WITH_NEW_EXPO_PROJECT_ID"
+        "projectId": "cd8a3e52-f3b4-49a3-95fa-8e9d3228ef20"
       }
     },
-    "owner": "ekfuingei"
+    "owner": "nobertteachingss-team"
   }
 }

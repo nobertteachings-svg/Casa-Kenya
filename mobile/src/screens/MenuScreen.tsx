@@ -27,7 +27,7 @@ export default function MenuScreen({
   onNeedLogin,
   onLogout,
 }: Props) {
-  const lang = "en" as const;
+  const lang = uiLanguage;
   const m = t(lang);
   const isLandlord = user?.role === "landlord";
   const { colors, ui } = useCasaTheme();
@@ -141,7 +141,7 @@ export default function MenuScreen({
                     value={diasporaPhone}
                     onChangeText={setDiasporaPhone}
                     keyboardType="phone-pad"
-                    placeholder="254…"
+                    placeholder="0712…"
                     placeholderTextColor={colors.mutedLight}
                   />
                   <Pressable
@@ -169,7 +169,7 @@ export default function MenuScreen({
               />
               <AccountActionRow
                 icon="phone-portrait-outline"
-                label={m.tenantVerifyMomo}
+                label={m.tenantVerifyMpesa}
                 onPress={() =>
                   requireLogin(() =>
                     void requestTenantVerification(token, "mpesa")

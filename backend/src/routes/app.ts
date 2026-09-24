@@ -5,7 +5,7 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
-import { redis, getSession, setSession } from "../redis/client.js";
+import { getSession, setSession } from "../redis/client.js";
 import { logger } from "../lib/logger.js";
 import { createRateLimiter } from "../middleware/rate-limit.js";
 import { findUser, createUser, isUserSuspended, updateUserLanguage } from "../services/users.js";
@@ -13,9 +13,14 @@ import { sendAuthenticationOtp, sendTextMessage } from "../services/whatsapp.js"
 import {
   APP_OTP_TTL_SEC,
   appLoginWhatsAppUrl,
+  canonicalPhone,
+  consumeLoginOtp,
   generateOTP,
   loginOtpMessage,
-  otpKey,
+  peekLoginOtp,
+  phoneAliases,
+  rememberOtpRequest,
+  storeLoginOtp,
 } from "../services/app-otp.js";
 import { upsertDeviceToken, deactivateAllDeviceTokens } from "../services/device-tokens.js";
 import { runWithAppTransport, type UIAction } from "../services/transport.js";
@@ -47,6 +52,7 @@ import {
   isAppReviewBypass,
   isAppReviewPhone,
 } from "../services/app-review-auth.js";
+import { normalizeKenyaPhone } from "../utils/kenya-phone.js";
 import type { Language, UserRole } from "../i18n/messages.js";
 
 export const appRouter = Router();
@@ -140,7 +146,9 @@ function optionalAppAuth(req: Request, _res: Response, next: NextFunction): void
   next();
 }
 
-function parseAppLanguage(_raw: unknown): Language {
+function parseAppLanguage(raw: unknown): Language | null {
+  const v = String(raw ?? "").trim().toLowerCase();
+  if (!v || v === "en" || v === "english") return "en";
   return "en";
 }
 
@@ -149,7 +157,7 @@ async function userPayload(user: Awaited<ReturnType<typeof findUser>>) {
   const base = {
     phone: user.phone,
     role: user.role,
-    language: "en" as const,
+    language: "en" as Language,
     display_name: user.display_name,
   };
   if (user.role === "landlord") {
@@ -163,7 +171,7 @@ function sessionPayload(session: Awaited<ReturnType<typeof getSession>>) {
   return {
     flow: session.flow,
     step: session.step,
-    language: "en",
+    language: "en" as Language,
     data: session.data ?? {},
   };
 }
@@ -173,26 +181,31 @@ function sessionPayload(session: Awaited<ReturnType<typeof getSession>>) {
 // ---------------------------------------------------------------------------
 
 appRouter.post("/auth/request-code", otpRequestLimiter, async (req: Request, res: Response) => {
-  const rawPhone = String(req.body?.phone ?? "").replace(/\D/g, "");
-  if (!rawPhone || rawPhone.length < 7) {
-    res.status(400).json({ error: "Valid phone number required" });
+  const rawInput = String(req.body?.phone ?? "");
+  const rawPhone = canonicalPhone(rawInput);
+  const reviewPhone = phoneAliases(rawPhone).some((p) => isAppReviewPhone(p));
+  if (!rawPhone || rawPhone.length < 7 || (!reviewPhone && !normalizeKenyaPhone(rawInput) && !normalizeKenyaPhone(rawPhone))) {
+    res.status(400).json({ error: "Enter a Kenyan mobile number (07XX or +254 7XX)" });
     return;
   }
 
   const lang = parseAppLanguage(req.body?.language) ?? "en";
-  const existing = isAppReviewPhone(rawPhone) ? null : await findUser(rawPhone);
+  let existing = null;
+  if (!reviewPhone) {
+    for (const p of phoneAliases(rawPhone)) {
+      existing = await findUser(p);
+      if (existing) break;
+    }
+  }
   if (existing) {
-    if (await isUserSuspended(rawPhone)) {
+    if (await isUserSuspended(existing.phone)) {
       res.status(403).json({
-        error:
-          lang === "fr"
-            ? "Ce compte Casa est temporairement suspendu."
-            : "This Casa account is temporarily suspended.",
+        error: "This Casa account is temporarily suspended.",
       });
       return;
     }
-    const token = signToken(rawPhone);
-    logger.info("App login without OTP", { phone: rawPhone });
+    const token = signToken(existing.phone);
+    logger.info("App login without OTP", { phone: existing.phone });
     res.json({
       ok: true,
       delivery: "existing_user",
@@ -204,22 +217,27 @@ appRouter.post("/auth/request-code", otpRequestLimiter, async (req: Request, res
     return;
   }
 
-  const reviewOtp = appReviewOtpForPhone(rawPhone);
-  const otp = reviewOtp ?? generateOTP();
+  const reviewOtp =
+    appReviewOtpForPhone(rawPhone) ??
+    phoneAliases(rawPhone).map(appReviewOtpForPhone).find(Boolean) ??
+    null;
+  const existingOtp = reviewOtp ? null : await peekLoginOtp(rawPhone);
+  const otp = reviewOtp ?? existingOtp ?? generateOTP();
 
   try {
-    await redis.set(otpKey(rawPhone), otp, "EX", OTP_TTL);
+    await storeLoginOtp(rawPhone, otp);
+    await rememberOtpRequest(rawPhone).catch(() => undefined);
   } catch (err) {
     logger.error("OTP store failed", { err: String(err) });
     res.status(503).json({ error: "Service unavailable, try again shortly" });
     return;
   }
 
-  const otpLang = lang === "fr" ? "fr" : "en";
+  const otpLang = "en" as const;
   const whatsappUrl = appLoginWhatsAppUrl(otpLang);
   let delivery: "whatsapp_template" | "whatsapp_click" | "review_bypass" = "whatsapp_click";
 
-  if (isAppReviewPhone(rawPhone)) {
+  if (reviewPhone) {
     delivery = "review_bypass";
   } else {
     const templated = await sendAuthenticationOtp(rawPhone, otp, otpLang, { discover: false });
@@ -238,7 +256,7 @@ appRouter.post("/auth/request-code", otpRequestLimiter, async (req: Request, res
     }
   }
 
-  logger.info("App OTP stored", { phone: rawPhone, delivery });
+  logger.info("App OTP stored", { phone: rawPhone, delivery, reused: Boolean(existingOtp) });
   res.json({ ok: true, expiresIn: OTP_TTL, delivery, whatsappUrl });
 });
 
@@ -247,42 +265,50 @@ appRouter.post("/auth/request-code", otpRequestLimiter, async (req: Request, res
 // ---------------------------------------------------------------------------
 
 appRouter.post("/auth/verify-code", otpVerifyLimiter, async (req: Request, res: Response) => {
-  const rawPhone = String(req.body?.phone ?? "").replace(/\D/g, "");
-  const code = String(req.body?.code ?? "").trim();
+  let rawPhone = canonicalPhone(String(req.body?.phone ?? ""));
+  const code = String(req.body?.code ?? "").replace(/\D/g, "");
 
   if (!rawPhone || !code) {
     res.status(400).json({ error: "phone and code required" });
     return;
   }
 
-  const reviewBypass = isAppReviewBypass(rawPhone, code);
+  const reviewBypass = phoneAliases(rawPhone).some((p) => isAppReviewBypass(p, code));
 
   if (!reviewBypass) {
-    let stored: string | null = null;
+    let consumed: Awaited<ReturnType<typeof consumeLoginOtp>>;
     try {
-      stored = await redis.get(otpKey(rawPhone));
+      consumed = await consumeLoginOtp(rawPhone, code);
     } catch (err) {
       logger.error("OTP fetch failed", { err: String(err) });
       res.status(503).json({ error: "Service unavailable" });
       return;
     }
 
-    if (!stored) {
+    if (consumed.status === "missing") {
       res.status(401).json({ error: "Code expired or not requested" });
       return;
     }
 
-    if (stored !== code) {
+    if (consumed.status === "mismatch") {
       res.status(401).json({ error: "Incorrect code" });
       return;
     }
 
-    await redis.del(otpKey(rawPhone)).catch(() => undefined);
+    if (consumed.phone) {
+      rawPhone = consumed.phone;
+    }
   }
 
-  const user = await findUser(rawPhone);
-  const token = signToken(rawPhone);
-  logger.info("App login success", { phone: rawPhone, newUser: !user });
+  let user = await findUser(rawPhone);
+  if (!user) {
+    for (const p of phoneAliases(rawPhone)) {
+      user = await findUser(p);
+      if (user) break;
+    }
+  }
+  const token = signToken(user?.phone ?? rawPhone);
+  logger.info("App login success", { phone: user?.phone ?? rawPhone, newUser: !user });
 
   res.json({
     token,
@@ -417,7 +443,7 @@ appRouter.patch("/language", appApiLimiter, requireAppAuth, async (req: Request,
   const phone = (req as AppRequest).appPhone!;
   const language = parseAppLanguage(req.body?.language);
   if (!language) {
-    res.status(400).json({ error: "language must be en or fr" });
+    res.status(400).json({ error: "language must be en" });
     return;
   }
 
@@ -612,7 +638,7 @@ appRouter.get(
       house,
       phone,
       user?.role,
-      (user?.language as "en" | "fr") ?? "en"
+      "en"
     );
     if (!detail) {
       res.status(404).json({ error: "Listing not found" });
@@ -640,7 +666,7 @@ appRouter.get("/my-listings", appApiLimiter, requireAppAuth, async (req: Request
   const houses = await findHousesByLandlord(phone);
   res.json({
     listings: houses.map((h) =>
-      houseToLandlordSummary(h, (user.language as "en" | "fr") ?? "en")
+      houseToLandlordSummary(h, "en")
     ),
   });
 });
@@ -690,7 +716,7 @@ appRouter.patch(
       updated,
       phone,
       user.role,
-      (user.language as "en" | "fr") ?? "en"
+      "en"
     );
     res.json({ ok: true, listing });
   }
@@ -724,7 +750,7 @@ appRouter.post(
           house,
           phone,
           user.role,
-          (user.language as "en" | "fr") ?? "en"
+          "en"
         )
       : null;
     res.json({ ok: true, listing });

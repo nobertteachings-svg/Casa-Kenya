@@ -168,13 +168,13 @@ export default function LiveShowcase({
                 <span className="showcase__type">
                   {propertyLabel(current.listing.type, lang)}
                   {current.listing.propertyCategory === "commercial"
-                    ? ` · ${lang === "fr" ? "Commercial" : "Commercial"}`
+                    ? " · Commercial"
                     : ""}
                 </span>
                 <p className="showcase__location">{current.listing.location}</p>
                 <p className="showcase__rent">
                   {formatRent(current.listing.rent, lang)}
-                  <span> / {lang === "fr" ? "mois" : "month"}</span>
+                  <span> / month</span>
                 </p>
               </div>
               <a

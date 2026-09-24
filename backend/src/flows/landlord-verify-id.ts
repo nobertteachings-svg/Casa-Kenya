@@ -24,10 +24,7 @@ export async function startLandlordIdVerification(
   if (already) {
     await sendTextMessage(
       phone,
-      lang === "fr"
-        ? "✅ Votre identité est déjà vérifiée."
-        : "✅ Your identity is already verified."
-    );
+      "✅ Your identity is already verified.");
     await showMainMenu(phone, "landlord", lang);
     return;
   }
@@ -41,10 +38,7 @@ export async function startLandlordIdVerification(
 
   await sendTextMessage(
     phone,
-    lang === "fr"
-      ? "🪪 *Vérification d'identité*\n\nEnvoyez *une seule photo* d'un document où votre *nom* est clairement visible.\n\nExemples acceptés: National ID, passeport, permis, reçu, facture NEPA ou tout autre document à votre nom.\n\nPas besoin du recto *et* du verso — une photo suffit."
-      : "🪪 *Identity verification*\n\nSend *one photo* of any document where your *name* is clearly visible.\n\nAccepted examples: National ID, passport, driver's license, receipt, NEPA/PHCN bill, or any other document with your name on it.\n\nNo need for front *and* back — one photo is enough."
-  );
+    "🪪 *Identity verification*\n\nSend *one photo* of any document where your *name* is clearly visible.\n\nAccepted examples: National ID, passport, driver's license, receipt, KPLC bill / M-Pesa statement, or any other document with your name on it.\n\nNo need for front *and* back — one photo is enough.");
 }
 
 export async function handleLandlordIdVerification(
@@ -69,27 +63,20 @@ export async function handleLandlordIdVerification(
   if (messageType !== "image" || !message?.imageId) {
     await sendTextMessage(
       phone,
-      lang === "fr"
-        ? "Veuillez envoyer *une photo* d'un document où votre *nom* est visible."
-        : "Please send *one photo* of a document where your *name* is visible."
-    );
+      "Please send *one photo* of a document where your *name* is visible.");
     return;
   }
 
   const downloadPromise = downloadImage(message.imageId);
   await sendTextMessage(
     phone,
-    lang === "fr" ? "🔍 Analyse du document…" : "🔍 Scanning your document…"
-  );
+    "🔍 Scanning your document…");
   const imageBuffer = await downloadPromise;
 
   if (!imageBuffer) {
     await sendTextMessage(
       phone,
-      lang === "fr"
-        ? "⏳ Photo reçue mais impossible à télécharger. Réessayez."
-        : "⏳ Photo received but could not be downloaded. Please try again."
-    );
+      "⏳ Photo received but could not be downloaded. Please try again.");
     return;
   }
 
@@ -97,10 +84,7 @@ export async function handleLandlordIdVerification(
   if (!scan) {
     await sendTextMessage(
       phone,
-      lang === "fr"
-        ? "⏳ Impossible d'analyser la photo. Renvoyez une image plus claire où le *nom* se lit bien."
-        : "⏳ Could not analyze the photo. Please resend a clearer image where the *name* is readable."
-    );
+      "⏳ Could not analyze the photo. Please resend a clearer image where the *name* is readable.");
     return;
   }
 
@@ -134,10 +118,7 @@ export async function requireLandlordVerification(
 
   await sendTextMessage(
     phone,
-    lang === "fr"
-      ? "⚠️ *Vérification requise*\n\nAvant de publier, envoyez *une photo* d'un document où votre *nom* est visible (National ID, passeport, reçu, etc.)."
-      : "⚠️ *Verification required*\n\nBefore listing, send *one photo* of a document where your *name* is visible (National ID, passport, receipt, etc.)."
-  );
+    "⚠️ *Verification required*\n\nBefore listing, send *one photo* of a document where your *name* is visible (National ID, passport, receipt, etc.).");
   await startLandlordIdVerification(phone, lang);
   return false;
 }

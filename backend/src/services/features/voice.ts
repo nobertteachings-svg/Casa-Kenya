@@ -74,14 +74,12 @@ export async function uploadWhatsAppMedia(
 /** Voice note pipeline — downloads media; full STT requires Whisper integration */
 export async function processVoiceNote(
   mediaId: string,
-  lang: "en" | "fr"
+  lang: "en"
 ): Promise<{ text: string | null; notice?: string }> {
   await downloadWhatsAppMedia(mediaId);
 
   const notice =
-    lang === "fr"
-      ? "🎤 Note vocale reçue ! Décrivez brièvement en texte ce que vous cherchez (transcription vocale complète bientôt disponible)."
-      : "🎤 Voice note received! Please type a brief description of what you need (full voice transcription coming soon).";
+    "🎤 Voice note received! Please type a brief description of what you need (full voice transcription coming soon).";
 
   return { text: null, notice };
 }

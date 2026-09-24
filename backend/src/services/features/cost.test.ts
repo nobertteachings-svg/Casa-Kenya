@@ -21,11 +21,11 @@ describe("move-in cost calculator", () => {
     expect(text).toContain("*Total: 60,000 KES*");
   });
 
-  it("formats French cost breakdown without Casa fee", () => {
-    const text = formatMoveInCost(60000, 2, "fr");
-    expect(text).toContain("Coût total pour emménager");
+  it("formats a two-month English cost breakdown without Casa fee", () => {
+    const text = formatMoveInCost(60000, 2, "en");
+    expect(text).toContain("Total cost to move in");
     expect(text).toContain("120,000");
-    expect(text).not.toContain("Frais de déblocage");
+    expect(text).not.toContain("Casa unlock fee");
     expect(text).toContain("*Total: 120,000 KES*");
   });
 });

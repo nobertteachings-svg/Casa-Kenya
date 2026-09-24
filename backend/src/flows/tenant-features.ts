@@ -34,20 +34,14 @@ export async function handleTenantExtras(
         await setSession(phone, { flow: "tenant_extras", step: "save_alert", language: lang, data: {} });
         await sendTextMessage(
           phone,
-          lang === "fr"
-            ? "Décrivez votre logement idéal (quartier, budget, facilités...). Vous serez notifié quand un bien correspond."
-            : "Describe your dream home (area, budget, facilities...). You'll be notified when a match appears."
-        );
+          "Describe your dream home (area, budget, facilities...). You'll be notified when a match appears.");
         return;
       case "2": {
         const list = await getShortlist(phone);
         if (list.length < 2) {
           await sendTextMessage(
             phone,
-            lang === "fr"
-              ? `Votre liste (${list.length}/2 min). Cherchez un logement et répondez *SAVE* sur les détails.`
-              : `Your shortlist (${list.length}/2 min). Search homes and reply *SAVE* on details.`
-          );
+            `Your shortlist (${list.length}/2 min). Search homes and reply *SAVE* on details.`);
         } else {
           const comparison = await compareHouses(
             list.map((h) => ({
@@ -78,18 +72,13 @@ export async function handleTenantExtras(
         await setSession(phone, { flow: "tenant_search", step: "diaspora_phone", language: lang, data: { diaspora: true } });
         await sendTextMessage(
           phone,
-          lang === "fr"
-            ? "Entrez le numéro WhatsApp du membre de votre famille au Kenya (ex: 234801...):"
-            : "Enter your family member's WhatsApp number in Kenya (e.g. 234801...):"
-        );
+          "Enter your family member's WhatsApp number in Kenya (e.g. 2547...):");
         return;
       case "4":
         await setSession(phone, { flow: "tenant_extras", step: "verify_method", language: lang, data: {} });
         await sendMenuMessage(
           phone,
-          lang === "fr"
-            ? "Vérification locataire — choisissez une méthode, puis envoyez les documents."
-            : "Tenant verification — choose a method, then send your documents.",
+          "Tenant verification — choose a method, then send your documents.",
           verificationMethodOptions(lang),
           menuButtonLabel(lang)
         );
@@ -98,10 +87,7 @@ export async function handleTenantExtras(
         await setSession(phone, { flow: "tenant_extras", step: "refer_phone", language: lang, data: {} });
         await sendTextMessage(
           phone,
-          lang === "fr"
-            ? "Entrez le numéro WhatsApp de la personne à parrainer:"
-            : "Enter the WhatsApp number of the person you're referring:"
-        );
+          "Enter the WhatsApp number of the person you're referring:");
         return;
       case "6": {
         const map = await getRentHeatMapText();
@@ -120,8 +106,7 @@ export async function handleTenantExtras(
     await createSavedSearch(phone, text, parsed);
     await sendTextMessage(
       phone,
-      lang === "fr" ? "✅ Alerte enregistrée ! Vous serez notifié sur WhatsApp." : "✅ Alert saved! You'll be notified on WhatsApp."
-    );
+      "✅ Alert saved! You'll be notified on WhatsApp.");
     await showMainMenu(phone, "tenant", lang);
     return;
   }
@@ -131,10 +116,7 @@ export async function handleTenantExtras(
     await requestVerification(phone, method);
     await sendTextMessage(
       phone,
-      lang === "fr"
-        ? "✅ Demande reçue. Envoyez une photo de votre National ID ou confirmez votre compte bancaire. Badge actif après vérification admin."
-        : "✅ Request received. Send a National ID/ID photo or confirm your Kenyan bank account. Badge active after admin verification."
-    );
+      "✅ Request received. Send a National ID/ID photo or confirm your Kenyan bank account. Badge active after admin verification.");
     await showMainMenu(phone, "tenant", lang);
     return;
   }
@@ -143,10 +125,7 @@ export async function handleTenantExtras(
     await createReferral(phone, choice.replace(/\D/g, ""));
     await sendTextMessage(
       phone,
-      lang === "fr"
-        ? "✅ Parrainage enregistré ! Vous recevrez un crédit déblocage gratuit quand ils complètent une transaction."
-        : "✅ Referral saved! You'll get a free unlock credit when they complete a transaction."
-    );
+      "✅ Referral saved! You'll get a free unlock credit when they complete a transaction.");
     await showMainMenu(phone, "tenant", lang);
     return;
   }
@@ -157,10 +136,7 @@ export async function handleTenantExtras(
       await reportListingAlreadyRented(houseId, phone);
       await sendTextMessage(
         phone,
-        lang === "fr"
-          ? "✅ Merci. Cette annonce a été retirée des recherches. Notre équipe informera le propriétaire."
-          : "✅ Thanks. This listing was removed from search. We'll notify the landlord."
-      );
+        "✅ Thanks. This listing was removed from search. We'll notify the landlord.");
       await showMainMenu(phone, "tenant", lang);
       return;
     }
@@ -173,13 +149,12 @@ export async function handleTenantExtras(
       });
       await sendTextMessage(
         phone,
-        lang === "fr" ? "Décrivez le problème avec cette annonce:" : "Describe the issue with this listing:"
-      );
+        "Describe the issue with this listing:");
       return;
     }
     await sendMenuMessage(
       phone,
-      lang === "fr" ? "Pourquoi signalez-vous cette annonce ?" : "Why are you reporting this listing?",
+      "Why are you reporting this listing?",
       flagReasonOptions(lang),
       menuButtonLabel(lang)
     );
@@ -191,8 +166,7 @@ export async function handleTenantExtras(
     await flagListing(houseId, phone, text);
     await sendTextMessage(
       phone,
-      lang === "fr" ? "✅ Signalement envoyé. Notre équipe va examiner cette annonce." : "✅ Report submitted. Our team will review this listing."
-    );
+      "✅ Report submitted. Our team will review this listing.");
     await showMainMenu(phone, "tenant", lang);
     return;
   }
@@ -203,15 +177,14 @@ export async function showUnlockedContacts(phone: string, lang: Language): Promi
   if (history.length === 0) {
     await sendTextMessage(
       phone,
-      lang === "fr" ? "Aucun contact débloqué pour le moment." : "No unlocked contacts yet."
-    );
+      "No unlocked contacts yet.");
     return;
   }
   const lines = history
     .slice(0, 10)
     .map((u) => `• *${u.house_id}* — ${u.landlord_phone} (${u.rent?.toLocaleString()} KES)`)
     .join("\n");
-  await sendTextMessage(phone, (lang === "fr" ? "📋 *Contacts débloqués:*\n" : "📋 *Unlocked contacts:*\n") + lines);
+  await sendTextMessage(phone, ("📋 *Unlocked contacts:*\n") + lines);
 }
 
 export async function handleSaveOrFlag(
@@ -225,10 +198,7 @@ export async function handleSaveOrFlag(
     const count = await addToShortlist(phone, houseId);
     await sendTextMessage(
       phone,
-      lang === "fr"
-        ? `✅ Ajouté à votre liste (${count}/3). Menu → Comparer quand vous avez 2+.`
-        : `✅ Added to shortlist (${count}/3). Menu → Compare when you have 2+.`
-    );
+      `✅ Added to shortlist (${count}/3). Menu → Compare when you have 2+.`);
     return true;
   }
   if (cmd === "flag" || cmd === "signaler") {
@@ -240,7 +210,7 @@ export async function handleSaveOrFlag(
     });
     await sendMenuMessage(
       phone,
-      lang === "fr" ? "Pourquoi signalez-vous cette annonce ?" : "Why are you reporting this listing?",
+      "Why are you reporting this listing?",
       flagReasonOptions(lang),
       menuButtonLabel(lang)
     );
@@ -250,7 +220,7 @@ export async function handleSaveOrFlag(
     const house = await findHouseById(houseId);
     if (house) {
       const agreement = await generateRentalAgreement(house, phone, lang);
-      await sendTextMessage(phone, `📄 *${lang === "fr" ? "Contrat de bail" : "Rental Agreement"}*\n\n${agreement}`);
+      await sendTextMessage(phone, `📄 *${"Rental Agreement"}*\n\n${agreement}`);
     }
     return true;
   }
@@ -261,15 +231,12 @@ export async function showTenantSubmenu(phone: string, lang: Language): Promise<
   const credits = await getAvailableCredits(phone);
   const creditNote =
     credits > 0
-      ? lang === "fr"
-        ? `\n🎁 ${credits} crédit(s) déblocage gratuit`
-        : `\n🎁 ${credits} free unlock credit(s)`
-      : "";
+      ? `\n🎁 ${credits} free unlock credit(s)`: "";
 
   const header =
-    (lang === "fr" ? "🔧 *Plus d'options*" : "🔧 *More options*") +
+    ("🔧 *More options*") +
     creditNote +
-    (lang === "fr" ? "\n\nTapez *MENU* pour retourner" : "\n\nType *MENU* to go back");
+    ("\n\nType *MENU* to go back");
 
   await sendMenuMessage(phone, header, tenantSubmenuOptions(lang), menuButtonLabel(lang));
   await setSession(phone, { flow: "tenant_extras", step: "submenu", language: lang, data: {} });

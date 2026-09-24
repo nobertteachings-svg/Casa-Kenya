@@ -1,4 +1,4 @@
-export type Lang = "en" | "fr";
+export type Lang = "en";
 
 const strings = {
   en: {
@@ -22,29 +22,6 @@ const strings = {
     export: "Export CSV",
     dark: "Dark",
     light: "Light",
-    language: "FR",
-  },
-  fr: {
-    dashboard: "Tableau de bord",
-    users: "Utilisateurs",
-    listings: "Annonces",
-    moderation: "Modération",
-    verifications: "Vérifications",
-    payments: "Paiements",
-    insights: "Analyses",
-    settings: "Paramètres",
-    audit: "Journal d'audit",
-    signOut: "Déconnexion",
-    search: "Rechercher téléphone, ID, quartier…",
-    runAiAll: "Lancer l'IA sur tout",
-    approve: "Approuver",
-    reject: "Rejeter",
-    verify: "Vérifier propriétaire",
-    suspend: "Suspendre",
-    unsuspend: "Réactiver",
-    export: "Exporter CSV",
-    dark: "Sombre",
-    light: "Clair",
     language: "EN",
   },
 } as const;

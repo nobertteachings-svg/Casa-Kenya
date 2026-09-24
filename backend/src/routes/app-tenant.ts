@@ -8,6 +8,7 @@ import { electricityMeterLabel } from "../constants/property-taxonomy.js";
 import type { Language } from "../i18n/messages.js";
 import { getSession, setSession } from "../redis/client.js";
 import { findUser } from "../services/users.js";
+import { normalizeKenyaPhone } from "../utils/kenya-phone.js";
 import { findHouseById } from "../services/houses.js";
 import { formatLocation, resolvePublicThumbUrl } from "../services/public-listings.js";
 import { resolveListingDetailForViewer } from "../services/listing-detail.js";
@@ -320,7 +321,7 @@ appTenantRouter.get("/referral-invite", async (req: Request, res: Response) => {
     res.status(403).json({ error: "Complete signup first" });
     return;
   }
-  const lang = (user.language === "fr" ? "fr" : "en") as Language;
+  const lang = ("en") as Language;
   res.json({
     message: buildReferralInviteMessage(lang, phone),
     referralPhone: phone,
@@ -341,9 +342,9 @@ appTenantRouter.get("/market/trends", async (_req: Request, res: Response) => {
 appTenantRouter.patch("/diaspora", async (req: Request, res: Response) => {
   const phone = await requireTenant(req, res);
   if (!phone) return;
-  const beneficiaryPhone = String(req.body?.beneficiaryPhone ?? "").replace(/\D/g, "");
-  if (beneficiaryPhone.length < 8) {
-    res.status(400).json({ error: "Valid beneficiary WhatsApp number required" });
+  const beneficiaryPhone = normalizeKenyaPhone(String(req.body?.beneficiaryPhone ?? ""));
+  if (!beneficiaryPhone) {
+    res.status(400).json({ error: "Enter a Kenyan mobile number for family in Kenya (07XX or +254 7XX)" });
     return;
   }
   const session = await getSession(phone);

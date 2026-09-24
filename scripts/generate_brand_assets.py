@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate Casa Nigeria brand assets from the master logo mark."""
+"""Regenerate Casa Kenya brand assets from the master logo mark."""
 
 from __future__ import annotations
 
@@ -88,8 +88,8 @@ def make_feature_graphic(path: Path) -> None:
     draw = ImageDraw.Draw(canvas)
     title = font(78)
     tag = font(34)
-    centered_text(draw, "Casa Nigeria", 330, title, (255, 255, 255), w)
-    centered_text(draw, "Find homes in Nigeria", 400, tag, (255, 255, 255), w)
+    centered_text(draw, "Casa Kenya", 330, title, (255, 255, 255), w)
+    centered_text(draw, "Find a home in Kenya", 400, tag, (255, 255, 255), w)
     canvas.save(path, "PNG", optimize=True)
     print(f"wrote {path}")
 
@@ -101,14 +101,14 @@ def make_og(path: Path) -> None:
     mark = fit(recolor_mark(load_mark(), (255, 255, 255)), 260, 260)
     canvas.paste(mark, ((w - mark.width) // 2, 90), mark)
     draw = ImageDraw.Draw(canvas)
-    centered_text(draw, "Casa Nigeria", 420, font(92), (255, 255, 255), w)
-    centered_text(draw, "Find your home on WhatsApp", 510, font(36), (255, 255, 255), w)
+    centered_text(draw, "Casa Kenya", 420, font(92), (255, 255, 255), w)
+    centered_text(draw, "Find a home in Kenya", 510, font(36), (255, 255, 255), w)
     canvas.save(path, "PNG", optimize=True)
     print(f"wrote {path}")
 
 
 def make_horizontal_lockup(path: Path) -> None:
-    """Black lockup: mark + 'casa nigeria' wordmark."""
+    """Black lockup: mark + 'casa kenya' wordmark."""
     mark = fit(load_mark(), 220, 220)
     # Crop near-black padding from mark for tighter lockup
     bbox = mark.getbbox()
@@ -118,9 +118,9 @@ def make_horizontal_lockup(path: Path) -> None:
     pad_x, pad_y = 48, 36
     gap = 28
     title_font = font(96)
-    # Measure text
+    wordmark = "casa kenya"
     probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
-    tb = probe.textbbox((0, 0), "casa nigeria", font=title_font)
+    tb = probe.textbbox((0, 0), wordmark, font=title_font)
     tw, th = tb[2] - tb[0], tb[3] - tb[1]
 
     content_h = max(mark.height, th)
@@ -133,7 +133,7 @@ def make_horizontal_lockup(path: Path) -> None:
     draw = ImageDraw.Draw(canvas)
     text_x = pad_x + mark.width + gap
     text_y = pad_y + (content_h - th) // 2 - tb[1]
-    draw.text((text_x, text_y), "casa nigeria", font=title_font, fill=LOCKUP_GREEN)
+    draw.text((text_x, text_y), wordmark, font=title_font, fill=LOCKUP_GREEN)
 
     canvas.convert("RGB").save(path, "PNG", optimize=True)
     print(f"wrote {path}")
@@ -183,15 +183,23 @@ def main() -> None:
     # Sync copies into marketing public
     Image.open(feature).save(PUBLIC / "casa_feature_graphic_1024x500.png", "PNG", optimize=True)
     Image.open(lockup).save(PUBLIC / "casa_logo_lockup_horizontal.png", "PNG", optimize=True)
+    Image.open(MARK_PATH).save(PUBLIC / "casa_logo_mark_master_1024.png", "PNG")
     print(f"wrote {PUBLIC / 'casa_feature_graphic_1024x500.png'}")
     print(f"wrote {PUBLIC / 'casa_logo_lockup_horizontal.png'}")
+    print(f"wrote {PUBLIC / 'casa_logo_mark_master_1024.png'}")
 
     make_app_icons()
 
-    admin_lockup = ADMIN_PUBLIC / "casa_logo_lockup_horizontal.png"
     if ADMIN_PUBLIC.exists():
-        Image.open(lockup).save(admin_lockup, "PNG", optimize=True)
-        print(f"wrote {admin_lockup}")
+        Image.open(lockup).save(ADMIN_PUBLIC / "casa_logo_lockup_horizontal.png", "PNG", optimize=True)
+        Image.open(MARK_PATH).save(ADMIN_PUBLIC / "casa_logo_mark_master_1024.png", "PNG")
+        print(f"wrote {ADMIN_PUBLIC / 'casa_logo_lockup_horizontal.png'}")
+        print(f"wrote {ADMIN_PUBLIC / 'casa_logo_mark_master_1024.png'}")
+
+    mobile_mark = ROOT / "mobile" / "assets" / "casa_logo_mark.png"
+    if mobile_mark.parent.exists():
+        Image.open(MARK_PATH).save(mobile_mark, "PNG")
+        print(f"wrote {mobile_mark}")
 
 
 if __name__ == "__main__":

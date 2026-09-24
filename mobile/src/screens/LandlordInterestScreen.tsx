@@ -18,7 +18,7 @@ interface Props {
 }
 
 export default function LandlordInterestScreen({ token, user, uiLanguage }: Props) {
-  const lang = "en" as const;
+  const lang = uiLanguage;
   const m = t(lang);
   const { colors, ui } = useCasaTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);

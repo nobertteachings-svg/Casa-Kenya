@@ -18,9 +18,11 @@ Regenerate feature graphic, OG image, lockup, and icons from the master mark:
 Set on Railway **casa-marketing** (build-time for `VITE_*`):
 
 ```env
-VITE_WHATSAPP_PHONE=15556677919
+VITE_WHATSAPP_PHONE=254182623299
 VITE_API_URL=https://api.casahomeskenya.com
 VITE_CONTACT_EMAIL=hello@casahomeskenya.com
+VITE_IOS_APP_URL=https://apps.apple.com/ke/search?term=Casa%20Kenya
+VITE_ANDROID_APP_URL=https://play.google.com/store/apps/details?id=com.casahomeskenya.app
 ```
 
 On **casa-backend**, set CORS:

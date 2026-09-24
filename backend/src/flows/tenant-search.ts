@@ -52,10 +52,7 @@ async function deliverUnlock(
   if (!isListingAvailable(house)) {
     await sendTextMessage(
       phone,
-      lang === "fr"
-        ? "⛔ Ce logement n'est plus disponible (déjà loué ou retiré). Cherchez à nouveau."
-        : "⛔ This home is no longer available (already rented or removed). Please search again."
-    );
+      "⛔ This home is no longer available (already rented or removed). Please search again.");
     return false;
   }
 
@@ -63,10 +60,7 @@ async function deliverUnlock(
   if (!unlockCheck.allowed) {
     await sendTextMessage(
       phone,
-      lang === "fr"
-        ? `⛔ Limite atteinte: ${unlockCheck.limit} contacts par jour. Revenez demain ou contactez le support.`
-        : `⛔ Daily limit reached: ${unlockCheck.limit} contacts per day. Try again tomorrow or contact support.`
-    );
+      `⛔ Daily limit reached: ${unlockCheck.limit} contacts per day. Try again tomorrow or contact support.`);
     return false;
   }
 
@@ -88,9 +82,7 @@ async function deliverUnlock(
   });
 
   const contactMsg =
-    lang === "fr"
-      ? `✅ *Contact propriétaire:*\n\n📞 ${house.landlord_phone}\n🗺 ${googleMapsLink(house.latitude, house.longitude)}`
-      : `✅ *Landlord contact:*\n\n📞 ${house.landlord_phone}\n🗺 ${googleMapsLink(house.latitude, house.longitude)}`;
+    `✅ *Landlord contact:*\n\n📞 ${house.landlord_phone}\n🗺 ${googleMapsLink(house.latitude, house.longitude)}`;
 
   if (!options?.skipMedia) {
     await sendHouseListingMedia(phone, house, lang);
@@ -101,10 +93,7 @@ async function deliverUnlock(
     await sendHouseListingMedia(data.beneficiary_phone, house, lang);
     await sendTextMessage(
       data.beneficiary_phone,
-      lang === "fr"
-        ? `🏠 *Casa — Logement pour vous*\n\n${formatHouseSummary(house, lang)}\n📞 Propriétaire: ${house.landlord_phone}\n🗺 ${googleMapsLink(house.latitude, house.longitude)}`
-        : `🏠 *Casa — Home for you*\n\n${formatHouseSummary(house, lang)}\n📞 Landlord: ${house.landlord_phone}\n🗺 ${googleMapsLink(house.latitude, house.longitude)}`
-    );
+      `🏠 *Casa — Home for you*\n\n${formatHouseSummary(house, lang)}\n📞 Landlord: ${house.landlord_phone}\n🗺 ${googleMapsLink(house.latitude, house.longitude)}`);
   }
 
   await sendPostUnlockConcierge(phone, house, lang);
@@ -122,16 +111,13 @@ function buildListingDetails(
       const costBlock = formatMoveInCost(house.rent, house.months_upfront, lang);
       const creditNote =
         isPaymentsEnabled && credits > 0
-          ? lang === "fr"
-            ? `\n🎁 Vous avez ${credits} crédit(s) gratuit(s) !`
-            : `\n🎁 You have ${credits} free unlock credit(s)!`
-          : "";
+          ? `\n🎁 You have ${credits} free unlock credit(s)!`: "";
 
       return (
         formatHouseSummary(house, lang) +
         verifiedBadge(lang, verified) +
         landlordVerifiedBadge(lang, landlordVerified) +
-        (house.trust_tier === "verified_plus" ? (lang === "fr" ? "\n✨ Vérifié+" : "\n✨ Verified+") : "") +
+        (house.trust_tier === "verified_plus" ? ("\n✨ Verified+") : "") +
         (house.ai_description ? `\n\n${house.ai_description}` : "") +
         `\n\n${costBlock}` +
         creditNote +
@@ -161,13 +147,10 @@ export async function handleTenantSearch(
     });
     await sendTextMessage(
       phone,
-      lang === "fr"
-        ? `✅ Mode diaspora activé pour ${data.beneficiary_phone ?? choice}.`
-        : `✅ Diaspora mode set for ${data.beneficiary_phone ?? choice}.`
-    );
+      `✅ Diaspora mode set for ${data.beneficiary_phone ?? choice}.`);
     await sendMenuMessage(
       phone,
-      lang === "fr" ? "Vous cherchez :" : "Looking for:",
+      "Looking for:",
       categoryMenuOptions(lang),
       menuButtonLabel(lang)
     );
@@ -182,7 +165,7 @@ export async function handleTenantSearch(
       } else if (cat) {
         data.property_category = cat;
       } else {
-        await sendTextMessage(phone, lang === "fr" ? "Choix invalide." : "Invalid choice.");
+        await sendTextMessage(phone, "Invalid choice.");
         return;
       }
       await setSession(phone, {
@@ -193,10 +176,7 @@ export async function handleTenantSearch(
       });
       await sendTextMessage(
         phone,
-        lang === "fr"
-          ? "Envoyez votre position 📍 ou décrivez ce que vous cherchez (quartier, loyer max, facilités...).\n\nAstuce: note vocale acceptée 🎤"
-          : "Send your location 📍 or describe what you need (area, max rent, facilities...).\n\nTip: voice notes welcome 🎤"
-      );
+        "Send your location 📍 or describe what you need (area, max rent, facilities...).\n\nTip: voice notes welcome 🎤");
       return;
     }
 
@@ -216,10 +196,7 @@ export async function handleTenantSearch(
         } else {
           await sendTextMessage(
             phone,
-            lang === "fr"
-              ? "Je n'ai pas trouvé ce quartier. Envoyez votre position 📍 ou précisez (ex: Westlands, Kilimani, Nyali)."
-              : "Couldn't find that area. Send your location 📍 or name an area (e.g. Westlands, Kilimani, Nyali)."
-          );
+            "Couldn't find that area. Send your location 📍 or name an area (e.g. Westlands, Kilimani, Nyali).");
           return;
         }
       } else {
@@ -249,8 +226,7 @@ export async function handleTenantSearch(
       if (results.length === 0) {
         await sendTextMessage(
           phone,
-          lang === "fr" ? "Aucun logement trouvé." : "No homes found nearby."
-        );
+          "No homes found nearby.");
         await showMainMenu(phone, "tenant", lang);
         return;
       }
@@ -258,9 +234,7 @@ export async function handleTenantSearch(
       const topResults = results.slice(0, 5);
 
       const header =
-        lang === "fr"
-          ? `✅ *${results.length} logement(s) trouvé(s)*\n👇 Photos et vidéos directement dans le chat — regardez ci-dessous`
-          : `✅ *${results.length} home(s) found*\n👇 Photos & videos are in the chat below — scroll up to view`;
+        `✅ *${results.length} home(s) found*\n👇 Photos & videos are in the chat below — scroll up to view`;
       await sendTextMessage(phone, header);
 
       for (let i = 0; i < topResults.length; i++) {
@@ -269,11 +243,7 @@ export async function handleTenantSearch(
 
       await sendMenuMessage(
         phone,
-        lang === "fr"
-          ? isPaymentsEnabled
-            ? "Choisissez un logement pour les détails et débloquer le contact."
-            : "Choisissez un logement pour voir les détails et obtenir le contact."
-          : isPaymentsEnabled
+        isPaymentsEnabled
             ? "Tap a listing for details and to unlock the contact."
             : "Tap a listing for details and the landlord's contact.",
         houseSelectOptions(topResults),
@@ -298,7 +268,7 @@ export async function handleTenantSearch(
       const idx = parseInt(choice, 10);
       const houseIds = data.results ?? [];
       if (idx < 1 || idx > houseIds.length) {
-        await sendTextMessage(phone, lang === "fr" ? "Numéro invalide." : "Invalid number.");
+        await sendTextMessage(phone, "Invalid number.");
         return;
       }
 
@@ -313,10 +283,7 @@ export async function handleTenantSearch(
       if (!isListingAvailable(house)) {
         await sendTextMessage(
           phone,
-          lang === "fr"
-            ? "⛔ Ce logement n'est plus disponible. Choisissez un autre ou relancez une recherche."
-            : "⛔ This home is no longer available. Pick another or search again."
-        );
+          "⛔ This home is no longer available. Pick another or search again.");
         return;
       }
 
@@ -335,7 +302,7 @@ export async function handleTenantSearch(
         }
         await sendMenuMessage(
           phone,
-          lang === "fr" ? "Que souhaitez-vous faire ?" : "What would you like to do?",
+          "What would you like to do?",
           houseActionOptions(lang, false),
           menuButtonLabel(lang)
         );
@@ -350,13 +317,10 @@ export async function handleTenantSearch(
 
       await sendTextMessage(
         phone,
-        lang === "fr"
-          ? `Pour débloquer: payez *${env.UNLOCK_FEE_KES.toLocaleString()} KES* (réf: *${house.house_id}*) puis appuyez *J'ai payé*.`
-          : `To unlock: pay *${env.UNLOCK_FEE_KES.toLocaleString()} KES* (ref: *${house.house_id}*) then tap *I paid*.`
-      );
+        `To unlock: pay *${env.UNLOCK_FEE_KES.toLocaleString()} KES* (ref: *${house.house_id}*) then tap *I paid*.`);
       await sendMenuMessage(
         phone,
-        lang === "fr" ? "Que souhaitez-vous faire ?" : "What would you like to do?",
+        "What would you like to do?",
         houseActionOptions(lang, true),
         menuButtonLabel(lang)
       );
@@ -382,7 +346,7 @@ export async function handleTenantSearch(
       if (!isPaymentsEnabled) {
         await sendMenuMessage(
           phone,
-          lang === "fr" ? "Choisissez une action :" : "Choose an action:",
+          "Choose an action:",
           houseActionOptions(lang, false),
           menuButtonLabel(lang)
         );
@@ -392,7 +356,7 @@ export async function handleTenantSearch(
       if (!["paid", "payé", "paye"].includes(choice.toLowerCase())) {
         await sendMenuMessage(
           phone,
-          lang === "fr" ? "Choisissez une action :" : "Choose an action:",
+          "Choose an action:",
           houseActionOptions(lang, true),
           menuButtonLabel(lang)
         );
@@ -413,10 +377,7 @@ export async function handleTenantSearch(
       if (!["paid", "payé", "paye"].includes(choice.toLowerCase())) {
         await sendTextMessage(
           phone,
-          lang === "fr"
-            ? `Après paiement, répondez PAYÉ (réf: ${data.selected_house_id}).`
-            : `After payment, reply PAID (ref: ${data.selected_house_id}).`
-        );
+          `After payment, reply PAID (ref: ${data.selected_house_id}).`);
         return;
       }
 

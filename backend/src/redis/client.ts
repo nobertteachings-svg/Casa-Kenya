@@ -1,5 +1,6 @@
 import { Redis } from "ioredis";
 import { env } from "../config/env.js";
+import type { Language } from "../i18n/messages.js";
 
 export const redis = new Redis(env.REDIS_URL, {
   maxRetriesPerRequest: 3,
@@ -14,7 +15,7 @@ export type FlowState = {
   flow: string;
   step: string;
   data: Record<string, unknown>;
-  language?: "en" | "fr";
+  language?: Language;
 };
 
 const SESSION_TTL = 60 * 60 * 24; // 24 hours
@@ -28,7 +29,8 @@ export async function getSession(phone: string): Promise<FlowState | null> {
     if (redis.status !== "ready") return null;
     const raw = await redis.get(sessionKey(phone));
     if (!raw) return null;
-    return JSON.parse(raw) as FlowState;
+    const parsed = JSON.parse(raw) as FlowState;
+    return { ...parsed, language: "en" };
   } catch (err) {
     console.warn("getSession failed:", err);
     return null;

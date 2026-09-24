@@ -9,7 +9,7 @@ export async function saveLanguagePref(lang: Language): Promise<void> {
 
 export async function loadLanguagePref(): Promise<Language | null> {
   const v = await SecureStore.getItemAsync(LANG_KEY);
-  if (v === "en" || v === "fr") return v;
+  if (v === "en" || v === "sw" || v === "fr") return "en";
   return null;
 }
 

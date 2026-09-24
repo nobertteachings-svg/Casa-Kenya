@@ -12,12 +12,7 @@ export async function notifyLandlordOfUnlock(
   const lang = (landlord?.language ?? "en") as Language;
 
   const message =
-    lang === "fr"
-      ? `🔔 *Nouveau locataire intéressé !*\n\n` +
-        `Quelqu'un a demandé votre contact pour:\n${formatHouseSummary(house, lang)}\n\n` +
-        `Numéro locataire: ${tenantPhone}\n\n` +
-        `Attendez-vous à un appel ou message WhatsApp bientôt.`
-      : `🔔 *New tenant interested!*\n\n` +
+    `🔔 *New tenant interested!*\n\n` +
         `Someone requested your contact for:\n${formatHouseSummary(house, lang)}\n\n` +
         `Tenant number: ${tenantPhone}\n\n` +
         `Expect a call or WhatsApp message soon.`;

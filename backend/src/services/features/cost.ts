@@ -19,25 +19,12 @@ export function calculateMoveInCost(rent: number, monthsUpfront: number): {
 export function formatMoveInCost(
   rent: number,
   monthsUpfront: number,
-  lang: "en" | "fr"
+  _lang: "en" = "en"
 ): string {
   const { upfrontTotal, unlockFee, grandTotal } = calculateMoveInCost(
     rent,
     monthsUpfront
   );
-  if (lang === "fr") {
-    const feeLine = isPaymentsEnabled
-      ? `• Frais de déblocage Casa: ${unlockFee.toLocaleString()} KES\n`
-      : "";
-    return (
-      `💰 *Coût total pour emménager:*\n` +
-      `• Loyer: ${rent.toLocaleString()} KES/mois\n` +
-      `• Avance (${monthsUpfront} mois): ${upfrontTotal.toLocaleString()} KES\n` +
-      feeLine +
-      `━━━━━━━━━━━━━━━━\n` +
-      `*Total: ${grandTotal.toLocaleString()} KES*`
-    );
-  }
   const feeLine = isPaymentsEnabled
     ? `• Casa unlock fee: ${unlockFee.toLocaleString()} KES\n`
     : "";

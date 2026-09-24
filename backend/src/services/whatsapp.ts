@@ -1,4 +1,6 @@
 import { env, isWhatsAppConfigured } from "../config/env.js";
+import { logger } from "../lib/logger.js";
+import { canonicalPhone } from "./app-otp.js";
 
 const GRAPH_API = "https://graph.facebook.com/v21.0";
 const API_TIMEOUT_MS = 10_000;
@@ -111,14 +113,169 @@ export async function sendVideoLink(
   return sendWhatsAppPayload(to, { type: "video", video });
 }
 
-/** Returns false so the app falls back to click-to-chat OTP (no Meta auth template required). */
+type TemplateComponent = Record<string, unknown>;
+
+export function authOtpLanguageFallbacks(_lang: "en" = "en"): string[] {
+  const preferred = env.WHATSAPP_OTP_TEMPLATE_LANG_EN;
+  const extras = ["en", "en_US", "en_GB"];
+  return [...new Set([preferred, ...extras].map((c) => c.trim()).filter(Boolean))];
+}
+
+export function authOtpTemplateNames(): string[] {
+  const named = env.WHATSAPP_OTP_TEMPLATE_NAME?.trim();
+  return [...new Set([named, "casa_login_code"].filter((n): n is string => Boolean(n)))];
+}
+
+export function authOtpComponentVariants(code: string): TemplateComponent[][] {
+  const bodyParam = { type: "text", text: code };
+  return [
+    [
+      { type: "body", parameters: [bodyParam] },
+      { type: "button", sub_type: "url", index: "0", parameters: [bodyParam] },
+    ],
+    [{ type: "body", parameters: [bodyParam] }],
+  ];
+}
+
+interface WaTemplateInfo {
+  name: string;
+  language: string;
+  status: string;
+  category: string;
+}
+
+let templateCache: { at: number; items: WaTemplateInfo[] } | null = null;
+const TEMPLATE_CACHE_MS = 5 * 60 * 1000;
+
+async function listWabaTemplates(): Promise<WaTemplateInfo[]> {
+  if (!isWhatsAppConfigured || !env.WHATSAPP_BUSINESS_ACCOUNT_ID) return [];
+  if (templateCache && Date.now() - templateCache.at < TEMPLATE_CACHE_MS) {
+    return templateCache.items;
+  }
+
+  const url = `${GRAPH_API}/${env.WHATSAPP_BUSINESS_ACCOUNT_ID}/message_templates?limit=100&fields=name,status,category,language`;
+  const response = await fetchWithTimeout(url, {
+    headers: { Authorization: `Bearer ${env.WHATSAPP_TOKEN}` },
+  });
+  if (!response.ok) {
+    logger.warn("WhatsApp template list failed", { status: response.status });
+    return templateCache?.items ?? [];
+  }
+  const json = (await response.json()) as { data?: WaTemplateInfo[] };
+  const items = json.data ?? [];
+  templateCache = { at: Date.now(), items };
+  return items;
+}
+
+async function ensureCasaLoginTemplates(): Promise<void> {
+  if (!isWhatsAppConfigured || !env.WHATSAPP_BUSINESS_ACCOUNT_ID) return;
+
+  const existing = await listWabaTemplates();
+  const needed: Array<{ language: string; button: string }> = [
+    { language: "en", button: "Copy Code" },
+  ];
+
+  for (const spec of needed) {
+    const already = existing.some(
+      (t) =>
+        t.name === "casa_login_code" &&
+        t.language === spec.language &&
+        (t.status === "APPROVED" || t.status === "PENDING" || t.status === "PENDING_DELETION")
+    );
+    if (already) continue;
+
+    const response = await fetchWithTimeout(
+      `${GRAPH_API}/${env.WHATSAPP_BUSINESS_ACCOUNT_ID}/message_templates`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.WHATSAPP_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: "casa_login_code",
+          language: spec.language,
+          category: "AUTHENTICATION",
+          message_send_ttl_seconds: 600,
+          components: [
+            { type: "BODY", add_security_recommendation: true },
+            { type: "FOOTER", code_expiration_minutes: 10 },
+            {
+              type: "BUTTONS",
+              buttons: [{ type: "OTP", otp_type: "COPY_CODE", text: spec.button }],
+            },
+          ],
+        }),
+      }
+    );
+    const body = await response.text();
+    if (response.ok) {
+      templateCache = null;
+      logger.info("WhatsApp OTP template submitted", { language: spec.language });
+    } else if (!body.includes("already exists") && !body.includes("834")) {
+      logger.warn("WhatsApp OTP template create failed", {
+        language: spec.language,
+        status: response.status,
+        err: body.slice(0, 400),
+      });
+    }
+  }
+}
+
+/**
+ * Send login OTP via a Meta authentication/utility template so it arrives
+ * even if the user has never messaged Casa (outside the 24h session window).
+ */
 export async function sendAuthenticationOtp(
-  _to: string,
-  _code: string,
-  _lang: "en" | "fr" = "en",
-  _options?: { discover?: boolean }
+  to: string,
+  code: string,
+  lang: "en" = "en",
+  options?: { discover?: boolean }
 ): Promise<boolean> {
-  return false;
+  if (!isWhatsAppConfigured) return false;
+
+  try {
+    const languages = authOtpLanguageFallbacks(lang);
+    const names = authOtpTemplateNames();
+    const componentsList = authOtpComponentVariants(code);
+
+    const tryName = async (name: string, langs: string[]): Promise<boolean> => {
+      for (const language of langs) {
+        for (const components of componentsList) {
+          const ok = await sendWhatsAppPayload(to, {
+            type: "template",
+            template: { name, language: { code: language }, components },
+          });
+          if (ok) {
+            logger.info("WhatsApp OTP template sent", { name, language });
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+
+    for (const name of names) {
+      if (await tryName(name, languages)) return true;
+    }
+
+    if (options?.discover === false) return false;
+
+    const listed = await listWabaTemplates();
+    const approvedAuth = listed.filter(
+      (t) => t.status === "APPROVED" && (t.category === "AUTHENTICATION" || t.category === "UTILITY")
+    );
+    const preferred = approvedAuth.filter((t) => languages.includes(t.language));
+    for (const t of [...preferred, ...approvedAuth]) {
+      if (await tryName(t.name, [t.language])) return true;
+    }
+
+    await ensureCasaLoginTemplates();
+    return tryName("casa_login_code", languages);
+  } catch (err) {
+    logger.warn("WhatsApp OTP template send failed", { err: String(err) });
+    return false;
+  }
 }
 
 export async function sendTextMessage(to: string, body: string): Promise<void> {
@@ -267,6 +424,26 @@ export async function markAsRead(messageId: string): Promise<void> {
   });
 }
 
+/** Prefer the phone in contacts.wa_id when Meta sends a LID in messages.from. */
+export function resolveWhatsAppSenderPhone(
+  from: string,
+  contacts?: Array<{ wa_id?: string; profile?: { name?: string } }>
+): { phone: string; name?: string } {
+  const fromDigits = from.replace(/\D/g, "");
+  const looksLikeMsisdn = (d: string) => d.length >= 10 && d.length <= 15;
+  const named = contacts?.find((c) => c.wa_id === from) ?? contacts?.[0];
+  const waDigits = (named?.wa_id ?? "").replace(/\D/g, "");
+
+  if (waDigits && looksLikeMsisdn(waDigits) && waDigits !== fromDigits) {
+    return { phone: waDigits, name: named?.profile?.name };
+  }
+  if (looksLikeMsisdn(fromDigits)) {
+    return { phone: fromDigits, name: named?.profile?.name };
+  }
+  if (waDigits) return { phone: waDigits, name: named?.profile?.name };
+  return { phone: fromDigits || from, name: named?.profile?.name };
+}
+
 export function parseWebhookPayload(body: unknown): IncomingMessage[] {
   const messages: IncomingMessage[] = [];
   if (!body || typeof body !== "object") return messages;
@@ -288,13 +465,17 @@ export function parseWebhookPayload(body: unknown): IncomingMessage[] {
       if (!value?.messages) continue;
 
       for (const msg of value.messages) {
-        const from = String(msg.from ?? "");
-        const contact = value.contacts?.find((c) => c.wa_id === from);
+        const rawFrom = String(msg.from ?? "");
+        const sender = resolveWhatsAppSenderPhone(rawFrom, value.contacts);
+        const contact =
+          value.contacts?.find((c) => c.wa_id === rawFrom) ??
+          value.contacts?.find((c) => c.wa_id === sender.phone) ??
+          value.contacts?.[0];
         const base = {
-          from,
+          from: canonicalPhone(sender.phone),
           id: String(msg.id ?? ""),
           timestamp: String(msg.timestamp ?? ""),
-          name: contact?.profile?.name,
+          name: sender.name ?? contact?.profile?.name,
         };
 
         if (msg.type === "text" && msg.text && typeof msg.text === "object") {

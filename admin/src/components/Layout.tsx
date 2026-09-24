@@ -44,7 +44,7 @@ export default function Layout() {
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`} aria-label="Admin navigation">
         <div className="brand">
           <img
-            src="/casa_logo_lockup_horizontal.png"
+            src="/casa_logo_mark_master_1024.png"
             alt="Casa Kenya"
             className="brand-logo"
           />

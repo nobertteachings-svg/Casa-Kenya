@@ -14,7 +14,9 @@ export async function findUser(phone: string): Promise<User | null> {
     "SELECT phone, role, language, display_name, created_at FROM users WHERE phone = $1",
     [phone]
   );
-  return result.rows[0] ?? null;
+  const row = result.rows[0];
+  if (!row) return null;
+  return { ...row, language: "en" };
 }
 
 export async function isUserSuspended(phone: string): Promise<boolean> {
@@ -40,8 +42,8 @@ export async function createUser(
        language = EXCLUDED.language,
        display_name = COALESCE(NULLIF(TRIM(users.display_name), ''), EXCLUDED.display_name),
        updated_at = NOW()
-     RETURNational IDG phone, role, language, display_name, created_at`,
-    [phone, role, language, name]
+     RETURNING phone, role, language, display_name, created_at`,
+    [phone, role, "en", name]
   );
   return result.rows[0];
 }

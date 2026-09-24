@@ -26,7 +26,7 @@ export async function isVerified(phone: string): Promise<boolean> {
   return result.rows[0]?.verified ?? false;
 }
 
-export function verifiedBadge(_lang: "en" | "fr", verified: boolean): string {
+export function verifiedBadge(_lang: "en", verified: boolean): string {
   if (!verified) return "";
   return " ✅ Verified tenant";
 }

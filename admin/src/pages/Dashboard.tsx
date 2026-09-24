@@ -5,7 +5,7 @@ import StatCard from "../components/StatCard";
 import ErrorBanner from "../components/ErrorBanner";
 import { BarChart } from "../components/BarChart";
 import type { DashboardStats } from "../types";
-import { formatDate, formatNgn } from "../utils";
+import { formatDate, formatKes } from "../utils";
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -70,8 +70,8 @@ export default function Dashboard() {
         <StatCard label="Total users" value={stats.users.total} sub={`+${stats.users.newToday} today`} accent="blue" />
         <StatCard label="Landlords" value={stats.users.landlords} accent="green" />
         <StatCard label="Active listings" value={stats.listings.active} sub={`${stats.listings.flagged} flagged`} accent="gold" />
-        <StatCard label="Earnings (month)" value={formatNgn(stats.revenue.earningsThisMonthNgn)} accent="gold" />
-        <StatCard label="Unlocks today" value={stats.revenue.unlocksToday} sub={formatNgn(stats.revenue.earningsTodayNgn)} accent="green" />
+        <StatCard label="Earnings (month)" value={formatKes(stats.revenue.earningsThisMonthKes)} accent="gold" />
+        <StatCard label="Unlocks today" value={stats.revenue.unlocksToday} sub={formatKes(stats.revenue.earningsTodayKes)} accent="green" />
         <StatCard label="Pending reviews" value={stats.moderation.pendingReviews} accent="red" />
       </section>
 
@@ -129,7 +129,7 @@ export default function Dashboard() {
                 <tr key={u.id}>
                   <td><code>{u.house_id}</code></td>
                   <td>{u.tenant_phone}</td>
-                  <td>{formatNgn(u.amount_paid)}</td>
+                  <td>{formatKes(u.amount_paid)}</td>
                 </tr>
               ))}
             </tbody>

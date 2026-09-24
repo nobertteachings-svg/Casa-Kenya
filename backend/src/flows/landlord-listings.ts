@@ -14,14 +14,7 @@ import {
   menuButtonLabel,
 } from "./menu-options.js";
 
-function statusLabel(status: string, lang: Language): string {
-  if (lang === "fr") {
-    if (status === "active") return "disponible";
-    if (status === "inactive") return "loué / retiré";
-    if (status === "flagged") return "signalé";
-    if (status === "under_review") return "en revue";
-    return status;
-  }
+function statusLabel(status: string): string {
   if (status === "active") return "available";
   if (status === "inactive") return "rented / off market";
   if (status === "flagged") return "flagged";
@@ -34,10 +27,7 @@ async function showListingActions(
   house: House,
   lang: Language
 ): Promise<void> {
-  const header =
-    lang === "fr"
-      ? `🏠 *${house.house_id}*\n${house.type} — ${house.rent.toLocaleString()} KES/mois\nStatut: ${statusLabel(house.status, lang)}`
-      : `🏠 *${house.house_id}*\n${house.type} — ${house.rent.toLocaleString()} KES/month\nStatus: ${statusLabel(house.status, lang)}`;
+  const header = `🏠 *${house.house_id}*\n${house.type} — ${house.rent.toLocaleString()} KES/month\nStatus: ${statusLabel(house.status)}`;
 
   await sendMenuMessage(
     phone,
@@ -59,16 +49,14 @@ export async function showLandlordListingManager(phone: string, lang: Language):
   if (houses.length === 0) {
     await sendTextMessage(
       phone,
-      lang === "fr" ? "Vous n'avez pas encore d'annonces." : "You have no listings yet."
+      "You have no listings yet."
     );
     await showMainMenu(phone, "landlord", lang);
     return;
   }
 
   const header =
-    lang === "fr"
-      ? "🏘 *Mes annonces*\nChoisissez un bien pour le marquer comme loué ou le réactiver."
-      : "🏘 *My listings*\nPick a property to mark as rented or put back on the market.";
+    "🏘 *My listings*\nPick a property to mark as rented or put back on the market.";
 
   await sendMenuMessage(phone, header, landlordListingPickerOptions(houses, lang), menuButtonLabel(lang));
 
@@ -99,7 +87,7 @@ export async function handleLandlordListings(
     if (!house || house.landlord_phone !== phone) {
       await sendTextMessage(
         phone,
-        lang === "fr" ? "Annonce introuvable. Choisissez dans la liste." : "Listing not found. Pick from the list."
+        "Listing not found. Pick from the list."
       );
       await showLandlordListingManager(phone, lang);
       return;
@@ -121,12 +109,8 @@ export async function handleLandlordListings(
       await sendTextMessage(
         phone,
         ok
-          ? lang === "fr"
-            ? `✅ *${houseId}* marqué comme loué. Il n'apparaîtra plus dans les recherches.`
-            : `✅ *${houseId}* marked as rented. It won't show in searches anymore.`
-          : lang === "fr"
-            ? "Impossible de mettre à jour cette annonce."
-            : "Couldn't update this listing."
+          ? `✅ *${houseId}* marked as rented. It won't show in searches anymore.`
+          : "Couldn't update this listing."
       );
       await showLandlordListingManager(phone, lang);
       return;
@@ -137,12 +121,8 @@ export async function handleLandlordListings(
       await sendTextMessage(
         phone,
         ok
-          ? lang === "fr"
-            ? `✅ *${houseId}* réactivé. Les locataires peuvent le voir à nouveau.`
-            : `✅ *${houseId}* is live again. Tenants can find it in search.`
-          : lang === "fr"
-            ? "Impossible de réactiver cette annonce."
-            : "Couldn't reactivate this listing."
+          ? `✅ *${houseId}* is live again. Tenants can find it in search.`
+          : "Couldn't reactivate this listing."
       );
       await showLandlordListingManager(phone, lang);
       return;

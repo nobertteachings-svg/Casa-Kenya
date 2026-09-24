@@ -37,7 +37,7 @@ export async function recordUnlock(params: {
          WHERE user_phone = $1 AND used = FALSE AND credit_type = 'free_unlock'
          AND (expires_at IS NULL OR expires_at > NOW())
          LIMIT 1
-       ) RETURNational IDG id`,
+       ) RETURNING id`,
       [params.tenantPhone]
     );
     if ((credit.rowCount ?? 0) > 0) amount = 0;
@@ -47,7 +47,7 @@ export async function recordUnlock(params: {
     `INSERT INTO unlocks (
       tenant_phone, house_id, amount_paid, beneficiary_phone, payer_phone, paid_at
     ) VALUES ($1,$2,$3,$4,$5,NOW())
-    RETURNational IDG id, tenant_phone, house_id, amount_paid, paid_at, beneficiary_phone`,
+    RETURNING id, tenant_phone, house_id, amount_paid, paid_at, beneficiary_phone`,
     [
       params.tenantPhone,
       params.houseId,

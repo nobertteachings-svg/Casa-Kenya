@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { api } from "../api/client";
-import { formatNgn } from "../utils";
+import { formatKes } from "../utils";
 
 export default function SettingsPage() {
   const [fee, setFee] = useState(5000);
@@ -39,7 +39,7 @@ export default function SettingsPage() {
           Fee (KES)
           <input type="number" min={500} step={500} value={fee} onChange={(e) => setFee(parseInt(e.target.value, 10))} />
         </label>
-        <p>Preview: {formatNgn(fee)} per unlock</p>
+        <p>Preview: {formatKes(fee)} per unlock</p>
         {error && <p className="error">{error}</p>}
         {saved && <p className="success">Saved — takes effect on new unlocks</p>}
         <button type="submit" className="btn-primary">Save pricing</button>

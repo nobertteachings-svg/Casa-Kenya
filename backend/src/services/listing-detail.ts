@@ -187,16 +187,15 @@ export interface LandlordListingUpdate {
   standbyGenerator?: boolean;
 }
 
-export function amenityLabels(lang: Language, amenities: ListingAmenities): string[] {
-  const fr = lang === "fr";
+export function amenityLabels(_lang: Language, amenities: ListingAmenities): string[] {
   const out: string[] = [];
-  if (amenities.water) out.push(fr ? "Eau fiable" : "Water supply");
+  if (amenities.water) out.push("Water supply");
   if (amenities.parking) out.push("Parking");
-  if (amenities.fenced) out.push(fr ? "Clôturé / sécurisé" : "Gated / fenced");
-  if (amenities.borehole) out.push(fr ? "Forage / réservoir" : "Borehole / tank");
-  if (amenities.furnished) out.push(fr ? "Meublé" : "Furnished");
-  if (amenities.security) out.push(fr ? "Sécurité / askari" : "Security / askari");
-  if (amenities.standbyGenerator) out.push(fr ? "Alim. de secours" : "Backup power");
+  if (amenities.fenced) out.push("Gated / fenced");
+  if (amenities.borehole) out.push("Borehole / tank");
+  if (amenities.furnished) out.push("Furnished");
+  if (amenities.security) out.push("Security / askari");
+  if (amenities.standbyGenerator) out.push("Backup power");
   return out;
 }
 

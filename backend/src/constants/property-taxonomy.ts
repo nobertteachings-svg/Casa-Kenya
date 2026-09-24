@@ -2,53 +2,53 @@ import type { Language } from "../i18n/messages.js";
 
 /** All 47 Kenyan counties, alphabetical by English name. */
 export const KENYA_COUNTIES = [
-  { id: "baringo", en: "Baringo", fr: "Baringo" },
-  { id: "bomet", en: "Bomet", fr: "Bomet" },
-  { id: "bungoma", en: "Bungoma", fr: "Bungoma" },
-  { id: "busia", en: "Busia", fr: "Busia" },
-  { id: "elgeyo_marakwet", en: "Elgeyo-Marakwet", fr: "Elgeyo-Marakwet" },
-  { id: "embu", en: "Embu", fr: "Embu" },
-  { id: "garissa", en: "Garissa", fr: "Garissa" },
-  { id: "homa_bay", en: "Homa Bay", fr: "Homa Bay" },
-  { id: "isiolo", en: "Isiolo", fr: "Isiolo" },
-  { id: "kajiado", en: "Kajiado", fr: "Kajiado" },
-  { id: "kakamega", en: "Kakamega", fr: "Kakamega" },
-  { id: "kericho", en: "Kericho", fr: "Kericho" },
-  { id: "kiambu", en: "Kiambu", fr: "Kiambu" },
-  { id: "kilifi", en: "Kilifi", fr: "Kilifi" },
-  { id: "kirinyaga", en: "Kirinyaga", fr: "Kirinyaga" },
-  { id: "kisii", en: "Kisii", fr: "Kisii" },
-  { id: "kisumu", en: "Kisumu", fr: "Kisumu" },
-  { id: "kitui", en: "Kitui", fr: "Kitui" },
-  { id: "kwale", en: "Kwale", fr: "Kwale" },
-  { id: "laikipia", en: "Laikipia", fr: "Laikipia" },
-  { id: "lamu", en: "Lamu", fr: "Lamu" },
-  { id: "machakos", en: "Machakos", fr: "Machakos" },
-  { id: "makueni", en: "Makueni", fr: "Makueni" },
-  { id: "mandera", en: "Mandera", fr: "Mandera" },
-  { id: "marsabit", en: "Marsabit", fr: "Marsabit" },
-  { id: "meru", en: "Meru", fr: "Meru" },
-  { id: "migori", en: "Migori", fr: "Migori" },
-  { id: "mombasa", en: "Mombasa", fr: "Mombasa" },
-  { id: "muranga", en: "Murang'a", fr: "Murang'a" },
-  { id: "nairobi", en: "Nairobi", fr: "Nairobi" },
-  { id: "nakuru", en: "Nakuru", fr: "Nakuru" },
-  { id: "nandi", en: "Nandi", fr: "Nandi" },
-  { id: "narok", en: "Narok", fr: "Narok" },
-  { id: "nyamira", en: "Nyamira", fr: "Nyamira" },
-  { id: "nyandarua", en: "Nyandarua", fr: "Nyandarua" },
-  { id: "nyeri", en: "Nyeri", fr: "Nyeri" },
-  { id: "samburu", en: "Samburu", fr: "Samburu" },
-  { id: "siaya", en: "Siaya", fr: "Siaya" },
-  { id: "taita_taveta", en: "Taita-Taveta", fr: "Taita-Taveta" },
-  { id: "tana_river", en: "Tana River", fr: "Tana River" },
-  { id: "tharaka_nithi", en: "Tharaka-Nithi", fr: "Tharaka-Nithi" },
-  { id: "trans_nzoia", en: "Trans Nzoia", fr: "Trans Nzoia" },
-  { id: "turkana", en: "Turkana", fr: "Turkana" },
-  { id: "uasin_gishu", en: "Uasin Gishu", fr: "Uasin Gishu" },
-  { id: "vihiga", en: "Vihiga", fr: "Vihiga" },
-  { id: "wajir", en: "Wajir", fr: "Wajir" },
-  { id: "west_pokot", en: "West Pokot", fr: "West Pokot" },
+  { id: "baringo", en: "Baringo", sw: "Baringo" },
+  { id: "bomet", en: "Bomet", sw: "Bomet" },
+  { id: "bungoma", en: "Bungoma", sw: "Bungoma" },
+  { id: "busia", en: "Busia", sw: "Busia" },
+  { id: "elgeyo_marakwet", en: "Elgeyo-Marakwet", sw: "Elgeyo-Marakwet" },
+  { id: "embu", en: "Embu", sw: "Embu" },
+  { id: "garissa", en: "Garissa", sw: "Garissa" },
+  { id: "homa_bay", en: "Homa Bay", sw: "Homa Bay" },
+  { id: "isiolo", en: "Isiolo", sw: "Isiolo" },
+  { id: "kajiado", en: "Kajiado", sw: "Kajiado" },
+  { id: "kakamega", en: "Kakamega", sw: "Kakamega" },
+  { id: "kericho", en: "Kericho", sw: "Kericho" },
+  { id: "kiambu", en: "Kiambu", sw: "Kiambu" },
+  { id: "kilifi", en: "Kilifi", sw: "Kilifi" },
+  { id: "kirinyaga", en: "Kirinyaga", sw: "Kirinyaga" },
+  { id: "kisii", en: "Kisii", sw: "Kisii" },
+  { id: "kisumu", en: "Kisumu", sw: "Kisumu" },
+  { id: "kitui", en: "Kitui", sw: "Kitui" },
+  { id: "kwale", en: "Kwale", sw: "Kwale" },
+  { id: "laikipia", en: "Laikipia", sw: "Laikipia" },
+  { id: "lamu", en: "Lamu", sw: "Lamu" },
+  { id: "machakos", en: "Machakos", sw: "Machakos" },
+  { id: "makueni", en: "Makueni", sw: "Makueni" },
+  { id: "mandera", en: "Mandera", sw: "Mandera" },
+  { id: "marsabit", en: "Marsabit", sw: "Marsabit" },
+  { id: "meru", en: "Meru", sw: "Meru" },
+  { id: "migori", en: "Migori", sw: "Migori" },
+  { id: "mombasa", en: "Mombasa", sw: "Mombasa" },
+  { id: "muranga", en: "Murang'a", sw: "Murang'a" },
+  { id: "nairobi", en: "Nairobi", sw: "Nairobi" },
+  { id: "nakuru", en: "Nakuru", sw: "Nakuru" },
+  { id: "nandi", en: "Nandi", sw: "Nandi" },
+  { id: "narok", en: "Narok", sw: "Narok" },
+  { id: "nyamira", en: "Nyamira", sw: "Nyamira" },
+  { id: "nyandarua", en: "Nyandarua", sw: "Nyandarua" },
+  { id: "nyeri", en: "Nyeri", sw: "Nyeri" },
+  { id: "samburu", en: "Samburu", sw: "Samburu" },
+  { id: "siaya", en: "Siaya", sw: "Siaya" },
+  { id: "taita_taveta", en: "Taita-Taveta", sw: "Taita-Taveta" },
+  { id: "tana_river", en: "Tana River", sw: "Tana River" },
+  { id: "tharaka_nithi", en: "Tharaka-Nithi", sw: "Tharaka-Nithi" },
+  { id: "trans_nzoia", en: "Trans Nzoia", sw: "Trans Nzoia" },
+  { id: "turkana", en: "Turkana", sw: "Turkana" },
+  { id: "uasin_gishu", en: "Uasin Gishu", sw: "Uasin Gishu" },
+  { id: "vihiga", en: "Vihiga", sw: "Vihiga" },
+  { id: "wajir", en: "Wajir", sw: "Wajir" },
+  { id: "west_pokot", en: "West Pokot", sw: "West Pokot" },
 ] as const;
 
 /** Common aliases people type instead of the official county id. */
@@ -97,42 +97,52 @@ export const RESIDENTIAL_SUBTYPES = [
   {
     id: "single_room",
     en: "Single room (shared bathroom / kitchen)",
-    fr: "Chambre simple (sanitaires / cuisine partagés)",
+    sw: "Chumba kimoja (bafu / jiko la pamoja)",
+  },
+  {
+    id: "double_room",
+    en: "Double room (two rooms, shared facilities)",
+    sw: "Vyumba viwili (vifaa vya pamoja)",
   },
   {
     id: "bedsitter",
     en: "Bedsitter (room + bathroom + kitchenette)",
-    fr: "Bedsitter (chambre + salle de bain + kitchenette)",
+    sw: "Bedsitter (chumba + bafu + jiko dogo)",
   },
   {
     id: "studio",
     en: "Studio (open-plan living + sleeping)",
-    fr: "Studio (pièce ouverte salon / chambre)",
+    sw: "Studio (sebule na kulala pamoja)",
   },
   {
     id: "one_bedroom",
     en: "1 bedroom (sitting room + bedroom)",
-    fr: "1 chambre (salon + chambre)",
+    sw: "Chumba 1 (sebule + chumba)",
   },
   {
     id: "two_bedroom",
     en: "2 bedroom",
-    fr: "2 chambres",
+    sw: "Vyumba 2",
   },
   {
     id: "three_bedroom_plus",
     en: "3+ bedroom",
-    fr: "3 chambres ou plus",
+    sw: "Vyumba 3 au zaidi",
   },
   {
     id: "maisonette",
     en: "Maisonette (multi-level)",
-    fr: "Maisonette (plusieurs niveaux)",
+    sw: "Maisonette (ghorofa mbili)",
   },
   {
     id: "bungalow",
     en: "Bungalow / standalone house",
-    fr: "Bungalow / maison individuelle",
+    sw: "Bungalow / nyumba pekee",
+  },
+  {
+    id: "servant_quarter",
+    en: "Servant quarter (SQ / annex)",
+    sw: "Servant quarter (SQ / annex)",
   },
 ] as const;
 
@@ -146,17 +156,20 @@ const LEGACY_SUBTYPE_ALIASES: Record<string, string> = {
   apartment_3room_plus: "three_bedroom_plus",
   apartment: "two_bedroom",
   standalone_house: "bungalow",
+  sq: "servant_quarter",
+  "servant quarters": "servant_quarter",
+  "double rooms": "double_room",
 };
 
 export const COMMERCIAL_SUBTYPES = [
-  { id: "shop", en: "Shop / retail space", fr: "Boutique / espace commercial" },
-  { id: "office", en: "Office space", fr: "Espace bureau" },
-  { id: "warehouse", en: "Warehouse / go-down", fr: "Entrepôt / go-down" },
-  { id: "restaurant", en: "Restaurant / bar / café", fr: "Restaurant / bar / café" },
-  { id: "salon", en: "Salon / barbershop", fr: "Salon de coiffure / barbier" },
-  { id: "workshop", en: "Workshop / garage", fr: "Atelier / garage" },
-  { id: "showroom", en: "Showroom / display space", fr: "Showroom / espace d'exposition" },
-  { id: "commercial_space", en: "Other commercial space", fr: "Autre espace commercial" },
+  { id: "shop", en: "Shop / retail space", sw: "Duka / nafasi ya biashara" },
+  { id: "office", en: "Office space", sw: "Ofisi" },
+  { id: "warehouse", en: "Warehouse / go-down", sw: "Godown / ghala" },
+  { id: "restaurant", en: "Restaurant / bar / café", sw: "Restaurant / bar / café" },
+  { id: "salon", en: "Salon / barbershop", sw: "Saluni / kinyozi" },
+  { id: "workshop", en: "Workshop / garage", sw: "Warsha / garaji" },
+  { id: "showroom", en: "Showroom / display space", sw: "Showroom" },
+  { id: "commercial_space", en: "Other commercial space", sw: "Nafasi nyingine ya biashara" },
 ] as const;
 
 export type PropertySubtype =
@@ -167,23 +180,23 @@ function normalizeSubtypeId(subtypeId: string): string {
   return LEGACY_SUBTYPE_ALIASES[subtypeId] ?? subtypeId;
 }
 
-export function regionLabel(regionId: string, lang: Language): string {
+export function regionLabel(regionId: string, lang?: Language): string {
   const r = KENYA_COUNTIES.find((x) => x.id === regionId);
   if (!r) return regionId;
-  return lang === "fr" ? r.fr : r.en;
+  return r.en;
 }
 
-export function subtypeLabel(subtypeId: string, lang: Language): string {
+export function subtypeLabel(subtypeId: string, lang?: Language): string {
   const id = normalizeSubtypeId(subtypeId);
   const all = [...RESIDENTIAL_SUBTYPES, ...COMMERCIAL_SUBTYPES];
   const s = all.find((x) => x.id === id);
   if (!s) return subtypeId;
-  return lang === "fr" ? s.fr : s.en;
+  return s.en;
 }
 
-export function categoryLabel(category: PropertyCategory, lang: Language): string {
-  if (category === "commercial") return lang === "fr" ? "Commercial" : "Commercial";
-  return lang === "fr" ? "Résidentiel" : "Residential";
+export function categoryLabel(category: PropertyCategory, lang?: Language): string {
+  if (category === "commercial") return "Commercial";
+  return "Residential";
 }
 
 /** Display label for a listing type in the mobile API. */
@@ -200,22 +213,18 @@ export function formatResidentialTypeLabel(
 
 export function formatRegionMenu(lang: Language): string {
   const lines = KENYA_COUNTIES.map(
-    (r, i) => `*${i + 1}.* ${lang === "fr" ? r.fr : r.en}`
+    (r, i) => `*${i + 1}.* ${r.en}`
   );
   const header =
-    lang === "fr" ? "Sélectionnez votre comté :" : "Select your county:";
+    "Select your county:";
   return `${header}\n\n${lines.join("\n")}`;
 }
 
 export function formatSubtypeMenu(category: PropertyCategory, lang: Language): string {
   const list = category === "residential" ? RESIDENTIAL_SUBTYPES : COMMERCIAL_SUBTYPES;
-  const lines = list.map((s, i) => `*${i + 1}.* ${lang === "fr" ? s.fr : s.en}`);
+  const lines = list.map((s, i) => `*${i + 1}.* ${s.en}`);
   const header =
-    lang === "fr"
-      ? category === "residential"
-        ? "Type de logement résidentiel :"
-        : "Type d'espace commercial :"
-      : category === "residential"
+    category === "residential"
         ? "Residential property type:"
         : "Commercial property type:";
   return `${header}\n\n${lines.join("\n")}`;
@@ -245,7 +254,7 @@ export function parseRegionChoice(choice: string): string | null {
       r.id === underscored ||
       r.id === compact ||
       r.en.toLowerCase() === lower ||
-      r.fr.toLowerCase() === lower ||
+      r.sw.toLowerCase() === lower ||
       r.en.toLowerCase().replace(/[()']/g, "").trim() === lower
   );
   return match?.id ?? null;
@@ -279,15 +288,17 @@ export function parseSubtypeChoice(
 
 export function parseCategoryChoice(choice: string): PropertyCategory | null {
   const c = choice.trim().toLowerCase();
-  if (c === "1" || c.includes("resident")) return "residential";
-  if (c === "2" || c.includes("commercial") || c.includes("business")) return "commercial";
+  if (c === "1" || c.includes("resident") || c.includes("makazi") || c.includes("nyumba")) return "residential";
+  if (c === "2" || c.includes("commercial") || c.includes("business") || c.includes("biashara")) return "commercial";
   return null;
 }
 
 /** Map subtype to legacy `type` column for DB compatibility */
 export function legacyTypeFromSubtype(subtype: string): string {
   const id = normalizeSubtypeId(subtype);
-  if (id === "single_room" || id === "bedsitter") return "room";
+  if (id === "single_room" || id === "double_room" || id === "bedsitter" || id === "servant_quarter") {
+    return "room";
+  }
   if (
     id === "studio" ||
     id === "one_bedroom" ||
@@ -309,9 +320,9 @@ export function legacyTypeFromSubtype(subtype: string): string {
 }
 
 export const ELECTRICITY_METER_TYPES = [
-  { id: "none", en: "No electricity", fr: "Pas d'électricité" },
-  { id: "prepaid", en: "Token meter (KPLC prepaid)", fr: "Compteur à jetons (prépayé KPLC)" },
-  { id: "postpaid", en: "Postpaid meter (KPLC bill)", fr: "Compteur postpayé (facture KPLC)" },
+  { id: "none", en: "No electricity", sw: "Hakuna umeme" },
+  { id: "prepaid", en: "Token meter (KPLC prepaid)", sw: "Mita ya tokeni (KPLC prepaid)" },
+  { id: "postpaid", en: "Postpaid meter (KPLC bill)", sw: "Mita ya postpaid (bili ya KPLC)" },
 ] as const;
 
 export type ElectricityMeter = (typeof ELECTRICITY_METER_TYPES)[number]["id"];
@@ -319,17 +330,15 @@ export type ElectricityMeter = (typeof ELECTRICITY_METER_TYPES)[number]["id"];
 export function electricityMeterLabel(meter: string, lang: Language): string {
   const m = ELECTRICITY_METER_TYPES.find((x) => x.id === meter);
   if (!m) return meter;
-  return lang === "fr" ? m.fr : m.en;
+  return m.en;
 }
 
 export function formatElectricityMeterMenu(lang: Language): string {
   const lines = ELECTRICITY_METER_TYPES.map(
-    (m, i) => `*${i + 1}.* ${lang === "fr" ? m.fr : m.en}`
+    (m, i) => `*${i + 1}.* ${m.en}`
   );
   const header =
-    lang === "fr"
-      ? "Type de compteur électrique :"
-      : "Electricity meter type:";
+    "Electricity meter type:";
   return `${header}\n\n${lines.join("\n")}`;
 }
 
@@ -339,7 +348,7 @@ export function parseElectricityMeterChoice(choice: string): ElectricityMeter | 
     return ELECTRICITY_METER_TYPES[idx - 1].id;
   }
   const lower = choice.trim().toLowerCase();
-  if (["none", "no", "non", "pas"].some((w) => lower.includes(w))) return "none";
+  if (["none", "no", "non", "pas", "hakuna"].some((w) => lower.includes(w))) return "none";
   if (
     lower.includes("prepaid") ||
     lower.includes("token") ||
@@ -369,26 +378,26 @@ export function formatFacilitiesSummary(
   lang: Language
 ): string {
   const boolItems = [
-    { key: "fenced", en: "Gated / fenced", fr: "Clôturé / sécurisé" },
-    { key: "parking", en: "Parking", fr: "Parking" },
-    { key: "standby_generator", en: "Backup power / generator", fr: "Alimentation de secours / générateur" },
-    { key: "borehole", en: "Borehole / water tank", fr: "Forage / réservoir d'eau" },
-    { key: "water", en: "Reliable water supply", fr: "Eau fiable" },
-    { key: "furnished", en: "Furnished", fr: "Meublé" },
-    { key: "security", en: "Security / askari", fr: "Sécurité / askari" },
+    { key: "fenced", en: "Gated / fenced", sw: "Eneo lenye lango / ua" },
+    { key: "parking", en: "Parking", sw: "Parking" },
+    { key: "standby_generator", en: "Backup power / generator", sw: "Umeme wa akiba / jenereta" },
+    { key: "borehole", en: "Borehole / water tank", sw: "Kisima / tanki la maji" },
+    { key: "water", en: "Reliable water supply", sw: "Maji ya kutegemewa" },
+    { key: "furnished", en: "Furnished", sw: "Imewekewa samani" },
+    { key: "security", en: "Security / askari", sw: "Askari / usalama" },
   ] as const;
 
-  const lines = boolItems.map(({ key, en, fr }) => {
+  const lines = boolItems.map(({ key, en, sw }) => {
     const val = draft[key as keyof typeof draft];
-    const yes = lang === "fr" ? "Oui" : "Yes";
-    const no = lang === "fr" ? "Non" : "No";
-    const label = lang === "fr" ? fr : en;
+    const yes = "Yes";
+    const no = "No";
+    const label = en;
     return `${label}: ${val ? yes : no}`;
   });
 
   if (draft.electricity_meter) {
     lines.push(
-      `${lang === "fr" ? "Électricité" : "Electricity"}: ${electricityMeterLabel(draft.electricity_meter, lang)}`
+      `${"Electricity"}: ${electricityMeterLabel(draft.electricity_meter, lang)}`
     );
   }
 

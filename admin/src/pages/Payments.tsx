@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client";
 import type { PaymentRow } from "../types";
-import { formatDate, formatNgn } from "../utils";
+import { formatDate, formatKes } from "../utils";
 
 export default function Payments() {
   const [payments, setPayments] = useState<PaymentRow[]>([]);
@@ -62,7 +62,7 @@ export default function Payments() {
         {Object.entries(byMethod).map(([method, amount]) => (
           <div key={method} className="panel stat-mini">
             <span className="muted">{method}</span>
-            <strong>{formatNgn(amount)}</strong>
+            <strong>{formatKes(amount)}</strong>
           </div>
         ))}
       </section>
@@ -91,7 +91,7 @@ export default function Payments() {
                     <td>{p.tenant_phone}</td>
                     <td><code>{p.house_id}</code></td>
                     <td>{p.neighbourhood ?? "—"}</td>
-                    <td>{formatNgn(p.amount_paid)}</td>
+                    <td>{formatKes(p.amount_paid)}</td>
                     <td>{p.payment_method ?? "—"}</td>
                     <td className="muted">{formatDate(p.paid_at)}</td>
                     <td>

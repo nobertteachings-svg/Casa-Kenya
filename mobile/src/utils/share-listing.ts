@@ -12,7 +12,7 @@ export function listingWebShareUrl(houseId: string): string {
 }
 
 export function listingAppDeepLink(houseId: string): string {
-  return `casacm://listing/${houseId.toUpperCase()}`;
+  return `casake://listing/${houseId.toUpperCase()}`;
 }
 
 export async function shareListing(houseId: string, type: string, rent: number, lang: Language): Promise<void> {
@@ -20,9 +20,7 @@ export async function shareListing(houseId: string, type: string, rent: number, 
   const web = listingWebShareUrl(id);
   const app = listingAppDeepLink(id);
   const message =
-    lang === "fr"
-      ? `🏠 ${type} — ${rent.toLocaleString()} KES/mois sur Casa\n\nOuvrir dans l'app:\n${app}\n\n${web}`
-      : `🏠 ${type} — ${rent.toLocaleString()} KES/month on Casa\n\nOpen in app:\n${app}\n\n${web}`;
+    `🏠 ${type} — ${rent.toLocaleString()} KES/month on Casa\n\nOpen in app:\n${app}\n\n${web}`;
   await Share.share({ message, url: web });
 }
 

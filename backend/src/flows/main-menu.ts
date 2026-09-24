@@ -13,22 +13,15 @@ import {
   menuButtonLabel,
 } from "./menu-options.js";
 
-const DEFAULT_LANG: Language = "en";
-
 export async function showMainMenu(
   phone: string,
   role: UserRole,
-  _lang: Language = DEFAULT_LANG
+  lang: Language = "en"
 ): Promise<void> {
-  const lang = DEFAULT_LANG;
-  const header =
-    "🏡 *Landlord Menu*\n\n🪪 ID verification required before listing\n🎥 Video walkthrough required\n💡 Voice notes welcome";
-  const tenantHeader =
-    "🔍 *Tenant Menu*\n\n💡 Voice notes welcome";
-
+  const m = t(lang);
   await sendMenuMessage(
     phone,
-    role === "landlord" ? header : tenantHeader,
+    role === "landlord" ? m.mainMenuLandlord : m.mainMenuTenant,
     mainMenuOptions(role, lang),
     menuButtonLabel(lang)
   );
@@ -43,14 +36,13 @@ export async function showMainMenu(
 export async function handleMainMenu(
   phone: string,
   text: string,
-  _lang: Language,
+  lang: Language,
   role: UserRole
 ): Promise<void> {
-  const lang = DEFAULT_LANG;
   const m = t(lang);
   const choice = text.trim();
 
-  if (choice === "4" || choice.toLowerCase() === "help" || choice.toLowerCase() === "aide") {
+  if (choice === "4" || choice.toLowerCase() === "help" || choice.toLowerCase() === "msaada") {
     await sendTextMessage(phone, m.help);
     await showMainMenu(phone, role, lang);
     return;
@@ -113,14 +105,13 @@ export async function handleMainMenu(
   await showMainMenu(phone, role, lang);
 }
 
-/** Legacy settings/language flow — always return to English main menu. */
 export async function handleSettings(
   phone: string,
   _text: string,
-  _lang: Language,
+  lang: Language,
   role: UserRole
 ): Promise<void> {
-  await showMainMenu(phone, role, DEFAULT_LANG);
+  await showMainMenu(phone, role, lang);
 }
 
 export { startRegistration };

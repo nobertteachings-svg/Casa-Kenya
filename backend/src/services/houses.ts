@@ -83,7 +83,7 @@ export async function createHouse(input: CreateHouseInput): Promise<House> {
       fenced, water, borehole, parking, electricity, electricity_meter, furnished, security, standby_generator,
       photos, videos, trust_tier, ai_description
     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25)
-    RETURNational IDG *`,
+    RETURNING *`,
     [
       input.landlord_phone,
       input.type,
@@ -206,7 +206,7 @@ export async function updateHouseByLandlord(
   const result = await query<House>(
     `UPDATE houses SET ${fields.join(", ")}
      WHERE house_id = $1 AND landlord_phone = $2
-     RETURNational IDG *`,
+     RETURNING *`,
     values
   );
   return result.rows[0] ?? null;
@@ -265,7 +265,7 @@ export function formatLocation(house: House, lang: Language): string {
     house.town ?? house.city,
     house.region ? regionLabel(house.region, lang) : null,
   ].filter(Boolean);
-  return parts.join(", ") || (lang === "fr" ? "Lieu inconnu" : "Unknown area");
+  return parts.join(", ") || ("Unknown area");
 }
 
 export function formatHouseSummary(
@@ -283,11 +283,11 @@ export function formatHouseSummary(
     meter !== "none" ? electricityMeterLabel(meter, lang) : null;
 
   const facilities = [
-    house.fenced ? (lang === "fr" ? "Clôturé / sécurisé" : "Gated / fenced") : null,
+    house.fenced ? ("Gated / fenced") : null,
     house.parking ? "Parking" : null,
-    house.standby_generator ? (lang === "fr" ? "Alim. de secours" : "Backup power") : null,
-    house.borehole ? (lang === "fr" ? "Forage / réservoir" : "Borehole / tank") : null,
-    house.water ? (lang === "fr" ? "Eau fiable" : "Water supply") : null,
+    house.standby_generator ? ("Backup power") : null,
+    house.borehole ? ("Borehole / tank") : null,
+    house.water ? ("Water supply") : null,
     meterLabel,
   ]
     .filter(Boolean)
@@ -295,13 +295,10 @@ export function formatHouseSummary(
 
   const distance =
     house.distance_km !== undefined
-      ? lang === "fr"
-        ? `\n📍 ${house.distance_km.toFixed(1)} km`
-        : `\n📍 ${house.distance_km.toFixed(1)} km away`
-      : "";
+      ? `\n📍 ${house.distance_km.toFixed(1)} km away`: "";
 
-  const rentLabel = lang === "fr" ? "KES/mois" : "KES/month";
-  const upfrontLabel = lang === "fr" ? "mois d'avance" : "months upfront";
+  const rentLabel = "KES/month";
+  const upfrontLabel = "months upfront";
 
   return (
     `*${house.house_id}*${categoryLine ? ` (${categoryLine})` : ""}\n` +

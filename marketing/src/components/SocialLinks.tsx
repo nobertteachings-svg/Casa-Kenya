@@ -2,7 +2,7 @@ const SOCIAL_LINKS = [
   {
     id: "whatsapp",
     label: "WhatsApp",
-    href: "https://wa.me/254700000000",
+    href: "https://wa.me/254182623299",
   },
   {
     id: "instagram",

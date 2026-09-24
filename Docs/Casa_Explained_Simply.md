@@ -20,7 +20,7 @@ Casa connects two groups of people:
 
 Behind the scenes, Casa uses **artificial intelligence (AI)** — a smart computer assistant called **Claude** — to understand messages, help write listings, search for homes, check ID cards, and answer questions.
 
-Casa is built for **Kenya**: prices are in **KES**, the product is **English-only**, and it understands neighbourhoods like Westlands, Nairobi, Kilimani, and more.
+Casa is built for **Kenya**: prices are in **KES**, the product is **English**, and it understands neighbourhoods like Westlands, Nairobi, Kilimani, and more.
 
 ---
 
@@ -123,6 +123,7 @@ The bot asks you one question at a time:
 
    **Residential:**  
    - Single room (shared bathroom / kitchen)  
+   - Double room (two rooms, shared facilities)  
    - Bedsitter (room + bathroom + kitchenette)  
    - Studio (open-plan living + sleeping)  
    - 1 bedroom (sitting room + bedroom)  
@@ -130,6 +131,7 @@ The bot asks you one question at a time:
    - 3+ bedroom  
    - Maisonette (multi-level)  
    - Bungalow / standalone house  
+   - Servant quarter (SQ / annex)  
 
    **Commercial:**  
    - Shop / retail space  
@@ -143,10 +145,10 @@ The bot asks you one question at a time:
 
 3. Monthly rent in KES  
 4. Months upfront required  
-5. **Select your county** (e.g. Nairobi, FCT, Rivers)  
-6. **Type the city** (e.g. Nairobi, Nairobi)  
-7. **Type the neighbourhood** (e.g. Westlands, Westlands)  
-8. **Pin your location on WhatsApp (GPS)** — after state, city, and neighbourhood  
+5. **Select your county** (e.g. Nairobi, Mombasa, Kisumu)  
+6. **Type the city** (e.g. Nairobi, Mombasa, Kisumu)  
+7. **Type the neighbourhood** (e.g. Westlands, Nyali, Milimani)  
+8. **Pin your location on WhatsApp (GPS)** — after county, city, and neighbourhood  
 9. Gated / fenced compound? Yes/No  
 10. Parking? Yes/No  
 11. Backup power / generator? Yes/No  
@@ -159,13 +161,13 @@ The bot asks you one question at a time:
 18. **Video walkthrough (required)**  
 19. Confirm and publish  
 
-### 4.3 Location (state, city, neighbourhood, then GPS)
+### 4.3 Location (county, city, neighbourhood, then GPS)
 
 You first **select your county**, **type the city**, and **type the neighbourhood** — then **pin the exact location** on WhatsApp.  
 Casa uses this so tenants can:
 
 - Find homes **near them** or in a specific area  
-- See **state, city, and neighbourhood** on the listing  
+- See **county, city, and neighbourhood** on the listing  
 - Get a **Google Maps link** to navigate to the property  
 
 ### 4.4 Photos
@@ -213,7 +215,7 @@ Casa sends landlords messages **without you asking**, on a schedule:
 
 ### 4.10 When a tenant pays to contact you
 
-When someone unlocks your contact, you are meant to receive a notification (full payment integration with Paystack and Flutterwave is still being completed).
+When someone unlocks your contact, you are meant to receive a notification (full M-Pesa Daraja payment integration is still being completed).
 
 ### 4.11 Property types reference
 
@@ -221,14 +223,16 @@ When someone unlocks your contact, you are meant to receive a notification (full
 
 | Type | What it means |
 |------|----------------|
-| Single room (basic) | Room only — no private toilet or kitchen |
-| Single room + toilet | Room with toilet, no kitchen |
-| Single room + toilet + kitchen | Room with toilet and kitchen |
+| Single room | Room only — shared bathroom / kitchen |
+| Double room | Two rooms, shared facilities |
 | Bedsitter | Room + bathroom + kitchenette |
-| 1 bedroom | Sitting room + bedroom + bathroom + kitchen |
+| Studio | Open-plan living and sleeping |
+| 1 bedroom | Sitting room + bedroom |
 | 2 bedroom | Sitting room + 2 bedrooms |
-| Maisonette / bungalow | Multi-level or standalone house |
-| Apartment (3+ rooms) | Three or more bedrooms |
+| 3+ bedroom | Three or more bedrooms |
+| Maisonette | Multi-level house |
+| Bungalow | Standalone house |
+| Servant quarter (SQ) | Annex / SQ |
 
 **Commercial (businesses):**
 
@@ -278,7 +282,7 @@ Claude understands:
 
 - Residential or commercial  
 - Specific property type (studio, single room, shop, etc.)  
-- Area / state / city / neighbourhood  
+- Area / county / city / neighbourhood  
 - Maximum rent  
 - Facilities you need (gated, parking, backup power, borehole/tank, water, token/postpaid meter, askari, etc.)  
 
@@ -315,11 +319,11 @@ This helps you avoid surprises.
 
 To get the landlord’s phone number:
 
-1. You pay **5,000 KES** via **Paystack** or **Flutterwave** (card, bank transfer, or USSD)  
+1. You pay **5,000 KES** via **M-Pesa** (Safaricom) using the house ID as the reference  
 2. Use the **house ID** (e.g. CASA-1001) as the payment reference  
-3. Reply **PAID**  
+3. Reply **PAID** or tap **I've paid** in the app  
 
-**Important:** Full automatic payment checking with Paystack/Flutterwave is still being connected. Right now, the system may unlock after you confirm payment — production will verify payments automatically.
+**Important:** Full automatic M-Pesa Daraja checking is still being connected. Right now, the system may unlock after you confirm payment — production will verify STK Push / C2B automatically.
 
 After unlock you receive:
 
@@ -353,7 +357,7 @@ Casa automatically sends you:
 | 1 | **Saved search alert** | Describe your dream home once; Casa messages you when a new match is listed |
 | 2 | **Compare shortlist** | Save 2–3 houses (reply **SAVE** on a listing), then get an AI comparison |
 | 3 | **Diaspora mode** | If you live abroad, search and pay for a home for family in Kenya — **both numbers** get the contact and map link |
-| 4 | **Get verified badge** | Upload ID or link Paystack — shows landlords you are a serious, verified tenant |
+| 4 | **Get verified badge** | Upload National ID or M-Pesa — shows landlords you are a serious, verified tenant |
 | 5 | **Refer a friend** | Invite someone; earn a **free unlock credit** when they complete a transaction |
 | 6 | **Rent heat map** | See average rents by neighbourhood (based on active listings on Casa) |
 
@@ -419,8 +423,8 @@ Claude needs an API key configured on the server. Without it, some AI features f
 
 ### Payment methods (planned / in progress)
 
-- **Paystack** (card, bank transfer, USSD)  
-- **Flutterwave** (card, bank transfer, mobile money)  
+- **M-Pesa** (Safaricom Daraja STK Push — primary)  
+- **Paystack Kenya** (card backup, once wired)  
 
 ### Referral rewards
 
@@ -431,7 +435,7 @@ Claude needs an API key configured on the server. Without it, some AI features f
 
 ## 9. Language
 
-Casa is **English-only** for Kenya. All menus, messages, and AI responses are in English.
+Casa is **English only** on WhatsApp, the app, and the website.
 
 ---
 
@@ -488,20 +492,20 @@ Casa has a **private website** for the team (not for regular users). Staff log i
 
 ### Landlord example
 
-1. Marie messages Casa on WhatsApp  
+1. Wanjiku messages Casa on WhatsApp  
 2. Registers as landlord  
 3. Sends photo of her National ID → AI approves → **Verified landlord**  
-4. Lists her apartment: chooses **residential** → **2-room apartment** → rent and upfront months  
-5. Selects **FCT** state, types **Nairobi** and **Westlands**, then pins GPS  
+4. Lists her house: chooses **residential** → **2 bedroom** → rent and upfront months  
+5. Selects **Nairobi** county, types **Nairobi** and **Westlands**, then pins GPS  
 6. Answers facilities (fenced, parking, **prepaid meter**, etc.)  
 7. Sends 3 photos and 1 walkthrough video  
 8. Listing **CASA-1042** goes live with **Verified+**  
 9. Next week she gets: “CASA-1042 got 8 views and 1 unlock”  
-10. A tenant pays 5,000 KES; Marie gets the tenant’s interest (notification when payments fully wired)  
+10. A tenant pays 5,000 KES; Wanjiku gets the tenant’s interest (notification when payments fully wired)  
 
 ### Tenant example
 
-1. Jean messages Casa in English, registers as tenant  
+1. Otieno messages Casa in English, registers as tenant  
 2. Chooses **Search** → **Residential**  
 3. Sends location in Nairobi  
 4. Types: “2-bedroom max 75k with water, parking, and prepaid meter”  
@@ -527,7 +531,7 @@ Each property gets a unique ID: **CASA-1000**, **CASA-1001**, etc.
 Casa stores (securely on servers):
 
 - Phone numbers and language preference  
-- Listing details: category (residential/commercial), property type, state, city, neighbourhood, rent, facilities (including **electricity meter type**: none, prepaid, or postpaid), photos, videos  
+- Listing details: category (residential/commercial), property type, county, city, neighbourhood, rent, facilities (including **electricity meter type**: none, prepaid, or postpaid), photos, videos  
 - Who unlocked which contact and when  
 - ID verification records (for landlords)  
 - Search alerts, shortlists, referrals, listing views, and flags  
@@ -538,12 +542,12 @@ Casa stores (securely on servers):
 
 | Works well today | Still in progress |
 |------------------|-------------------|
-| WhatsApp chat flows (English) | Automatic Paystack/Flutterwave payment verification |
+| WhatsApp chat flows (English) | Automatic M-Pesa Daraja payment verification |
 | Landlord & tenant registration | Storing photos/videos on Cloudinary (permanent cloud storage) |
 | Landlord ID verification (Claude Vision) | Full voice-note transcription |
 | Required video walkthrough (Verified+) | USSD partnership with telco |
 | Residential & commercial property types | Production hosting for thousands of users |
-| State → city → neighbourhood → GPS listing flow | Landlord payment notifications |
+| County → city → neighbourhood → GPS listing flow | Landlord payment notifications |
 | Electricity meter type (prepaid/postpaid/none) | Advanced AI fraud detection on every photo |
 | Tenant search by category and facilities | Featured listings (paid promotion) |
 | Search by GPS and natural language | |
@@ -563,17 +567,17 @@ Casa stores (securely on servers):
 | **Unlock** | Paying 5,000 KES to get a landlord’s phone number |
 | **National ID** | Kenya national ID card |
 | **KES** | Kenyan shilling (money used in Kenya) |
-| **KPLC** | Kenya’s electricity distribution companies (listings show prepaid or postpaid meter type) |
+| **KPLC** | Kenya Power — listings show prepaid (token) or postpaid meter type |
 | **Token meter** | KPLC prepaid electricity (buy tokens) |
 | **Postpaid meter** | Pay electricity bill monthly after use |
 | **Residential** | Housing for people to live in |
 | **Commercial** | Space for businesses (shop, office, warehouse) |
-| **Quarter** | Neighbourhood within a city (e.g. Westlands, Westlands) — also called an area or district |
+| **Quarter** | Neighbourhood within a city (e.g. Westlands, Kilimani) — also called an area or estate |
 | **GPS pin** | Exact map location sent via WhatsApp |
 | **Verified landlord** | Landlord passed ID check |
 | **Verified+** | Listing includes required walkthrough video |
 | **Claude** | AI assistant that powers smart features |
-| **Paystack / Flutterwave** | Kenyan payment gateways (card, bank, USSD) |
+| **M-Pesa** | Safaricom mobile money — how most Kenyans pay |
 | **Diaspora** | Kenyans living abroad |
 | **USSD** | Simple text menu on basic phones (`*code#`) |
 
@@ -581,7 +585,7 @@ Casa stores (securely on servers):
 
 ## 16. One-sentence summary
 
-**Casa is WhatsApp for renting homes and commercial spaces in Kenya — landlords prove who they are and film their properties, tenants search by residential or commercial type and pay a small fee to get the landlord’s number and directions, all in English.**
+**Casa is WhatsApp for renting homes and commercial spaces in Kenya — landlords prove who they are and film their properties, tenants search by residential or commercial type and pay a small fee to get the landlord’s number and directions.**
 
 ---
 

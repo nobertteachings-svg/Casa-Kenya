@@ -104,7 +104,7 @@ export default function ListingDetailModal({
   preview,
   lowDataMode = false,
 }: Props) {
-  const lang = "en" as const;
+  const lang = uiLanguage;
   const m = t(lang);
   const { colors, gradient } = useCasaTheme();
   const styles = useMemo(() => makeDetailStyles(colors), [colors]);
@@ -259,18 +259,9 @@ export default function ListingDetailModal({
 
   const meterLabel =
     listing?.amenities.electricityMeter === "prepaid"
-      ? lang === "fr"
-        ? "Prépayé"
-        : "Token meter"
-      : listing?.amenities.electricityMeter === "postpaid"
-        ? lang === "fr"
-          ? "Postpayé"
-          : "Postpaid bill"
-        : listing?.amenities.electricityMeter === "none"
-          ? lang === "fr"
-            ? "Aucun"
-            : "None"
-          : null;
+      ? "Token meter": listing?.amenities.electricityMeter === "postpaid"
+        ? "Postpaid bill": listing?.amenities.electricityMeter === "none"
+          ? "None": null;
 
   async function submitReport() {
     if (!houseId || reportReason.trim().length < 3) return;
@@ -453,10 +444,7 @@ export default function ListingDetailModal({
                     onPress={() =>
                       openWhatsApp(
                         listing.landlordPhone!,
-                        lang === "fr"
-                          ? `Bonjour, je suis intéressé par votre annonce Casa (${listing.houseId}).`
-                          : `Hello, I'm interested in your Casa listing (${listing.houseId}).`
-                      )
+                        `Hello, I'm interested in your Casa listing (${listing.houseId}).`)
                     }
                   >
                     <Ionicons name="logo-whatsapp" size={20} color={colors.onDark} />

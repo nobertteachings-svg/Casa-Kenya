@@ -28,7 +28,7 @@ export default function Login() {
       <form className="login-card" onSubmit={handleSubmit}>
         <div className="brand brand--center">
           <img
-            src="/casa_logo_lockup_horizontal.png"
+            src="/casa_logo_mark_master_1024.png"
             alt="Casa Kenya"
             className="brand-logo"
           />

@@ -11,7 +11,7 @@ export async function createSavedSearch(
 ): Promise<string> {
   const result = await query<{ id: string }>(
     `INSERT INTO saved_searches (tenant_phone, query_json, raw_description)
-     VALUES ($1, $2, $3) RETURNational IDG id`,
+     VALUES ($1, $2, $3) RETURNING id`,
     [tenantPhone, JSON.stringify(queryJson), rawDescription]
   );
   return result.rows[0].id;

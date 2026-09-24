@@ -20,4 +20,13 @@ Scan the QR code with Expo Go, or press `i` / `a` for simulator.
 
 ## Production builds
 
-See [Docs/MOBILE_APP.md](../Docs/MOBILE_APP.md) for Railway env vars, EAS builds, and App Store / Play Store submission.
+Same Expo + Apple accounts as Casa Rwanda. Android is a **manual Play upload**.
+
+```bash
+cd mobile
+npx eas-cli build --platform ios --profile production
+npx eas-cli submit --platform ios --profile production
+npx eas-cli build --platform android --profile production
+```
+
+Then download the `.aab` and upload it in Play Console → **Casa Kenya** (`com.casahomeskenya.app`) → Create release. Do not run `eas submit --platform android`.

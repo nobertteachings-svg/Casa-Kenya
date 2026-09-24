@@ -32,12 +32,12 @@ router.get("/privacy", (_req: Request, res: Response) => {
         "Privacy Policy",
         `
   <h1>Privacy Policy</h1>
-  <p class="muted">Last updated: 28 July 2026</p>
-  <p>Casa Kenya (“Casa”, “we”) provides a WhatsApp-based housing marketplace for Kenya. This policy explains what data we collect and how we use it.</p>
+  <p class="muted">Last updated: 23 September 2026</p>
+  <p>Casa Kenya (“Casa”, “we”) provides a Kenyan housing marketplace on the Casa Kenya iOS and Android apps, WhatsApp, and casahomeskenya.com. This policy explains what data we collect and how we use it. We process personal data in line with the <strong>Kenya Data Protection Act, 2019</strong> and guidance from the Office of the Data Protection Commissioner (ODPC).</p>
 
   <h2>Information we collect</h2>
   <ul>
-    <li>WhatsApp phone number and display name when you message Casa</li>
+    <li>Phone number and display name when you use the Casa Kenya app or message us on WhatsApp</li>
     <li>Messages you send (search preferences, listing details, photos/videos you upload)</li>
     <li>Location pins you choose to share for nearby search</li>
     <li>Landlord identity documents submitted for verification (e.g. National ID / passport images)</li>
@@ -66,6 +66,12 @@ router.get("/privacy", (_req: Request, res: Response) => {
   </ol>
   <p>We will remove or anonymise personal data within a reasonable period, except where we must retain information for legal, fraud-prevention, or security reasons.</p>
 
+  <h2>Your rights</h2>
+  <p>Under the Kenya Data Protection Act you may request access, correction, deletion, or restriction of your personal data, and you may lodge a complaint with the ODPC.</p>
+
+  <h2>Governing law</h2>
+  <p>This policy is governed by the laws of the Republic of Kenya. Nairobi is our primary place of business.</p>
+
   <h2>Contact</h2>
   <p>Email: <a href="mailto:hello@casahomeskenya.com">hello@casahomeskenya.com</a><br/>
   Website: <a href="https://casahomeskenya.com">casahomeskenya.com</a></p>
@@ -82,11 +88,11 @@ router.get("/terms", (_req: Request, res: Response) => {
         "Terms of Service",
         `
   <h1>Terms of Service</h1>
-  <p class="muted">Last updated: 28 July 2026</p>
-  <p>By using Casa Kenya on WhatsApp or our website, you agree to these terms.</p>
+  <p class="muted">Last updated: 23 September 2026</p>
+  <p>By using Casa Kenya on the iOS or Android app, WhatsApp, or casahomeskenya.com, you agree to these terms. Casa Kenya is a Kenyan housing marketplace. These terms are governed by the laws of the Republic of Kenya.</p>
 
   <h2>What Casa is</h2>
-  <p>Casa Kenya helps landlords list rental properties and tenants discover homes via WhatsApp. Casa is a technology platform. We are not a landlord, agent, or party to your rental agreement.</p>
+  <p>Casa Kenya helps landlords list rental properties and tenants discover homes on the Casa Kenya app and WhatsApp. Casa is a technology platform. We are not a landlord, agent, or party to your rental agreement.</p>
 
   <h2>Your responsibilities</h2>
   <ul>
@@ -100,13 +106,16 @@ router.get("/terms", (_req: Request, res: Response) => {
   <p>Casa is designed for direct landlord–tenant connection. Do not use Casa to run exploitative agency practices that mislead users.</p>
 
   <h2>Payments</h2>
-  <p>Any unlock or platform fees will be disclosed in-product. Rent is paid between tenant and landlord, not through Casa unless we clearly say otherwise.</p>
+  <p>Any unlock or platform fees will be disclosed in-product and are charged in Kenyan shillings (KES), typically via M-Pesa. Rent is paid between tenant and landlord, not through Casa unless we clearly say otherwise.</p>
 
   <h2>Content and media</h2>
   <p>You grant Casa a licence to store and display listing content you upload for operating the service. Do not upload illegal or infringing content.</p>
 
   <h2>Disclaimer</h2>
   <p>Listings are provided by users. Casa does not guarantee availability, accuracy, or outcome of any rental. Always inspect before paying.</p>
+
+  <h2>Governing law</h2>
+  <p>These terms are governed by Kenyan law. Disputes shall be subject to the courts of Kenya.</p>
 
   <h2>Contact</h2>
   <p><a href="mailto:hello@casahomeskenya.com">hello@casahomeskenya.com</a></p>

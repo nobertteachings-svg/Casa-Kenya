@@ -28,7 +28,7 @@ interface Props {
 }
 
 export default function UnlockedContactsScreen({ token, user, uiLanguage, onGoToSearch, onNeedLogin }: Props) {
-  const lang = "en" as const;
+  const lang = uiLanguage;
   const m = t(lang);
   const { ui } = useCasaTheme();
   const [contacts, setContacts] = useState<UnlockedContact[]>([]);
@@ -98,10 +98,7 @@ export default function UnlockedContactsScreen({ token, user, uiLanguage, onGoTo
                   onPress={() =>
                     openWhatsApp(
                       item.landlordPhone,
-                      lang === "fr"
-                        ? `Bonjour, concernant ${item.neighbourhood ?? "Casa"} sur Casa.`
-                        : `Hello, regarding ${item.neighbourhood ?? "Casa"} on Casa.`
-                    )
+                      `Hello, regarding ${item.neighbourhood ?? "Casa"} on Casa.`)
                   }
                 >
                   <Ionicons name="logo-whatsapp" size={16} color={colors.white} />
