@@ -60,18 +60,24 @@ export async function handleLandlordIdVerification(
 
   if (step !== "await_id_photo") return;
 
-  if (messageType !== "image" || !message?.imageId) {
+  if (messageType !== "image" || (!message?.imageId && !message?.mediaRef)) {
     await sendTextMessage(
       phone,
       "Please send *one photo* of a document where your *name* is visible.");
     return;
   }
 
-  const downloadPromise = downloadImage(message.imageId);
-  await sendTextMessage(
-    phone,
-    "🔍 Scanning your document…");
-  const imageBuffer = await downloadPromise;
+  await sendTextMessage(phone, "🔍 Scanning your document…");
+
+  let imageBuffer: Buffer | null = null;
+  if (message.mediaRef) {
+    const { fetchCloudinaryBuffer } = await import("../services/features/cloudinary-media.js");
+    imageBuffer = await fetchCloudinaryBuffer(message.mediaRef);
+  } else if (message.imageId) {
+    imageBuffer = await downloadImage(message.imageId);
+  } else {
+    return;
+  }
 
   if (!imageBuffer) {
     await sendTextMessage(
@@ -90,7 +96,7 @@ export async function handleLandlordIdVerification(
 
   const outcome = await finalizeLandlordIdVerification(
     phone,
-    message.imageId,
+    message.mediaRef ?? message.imageId!,
     null,
     scan,
     lang
