@@ -30,6 +30,8 @@ type Strings = {
   welcomeSignup: string;
   tapMenu: string;
   errorGeneric: string;
+  errorUploadTooLarge: string;
+  errorUploadRead: string;
   invalidKenyaPhone: string;
   tabChat: string;
   tabBrowse: string;
@@ -375,6 +377,8 @@ const en: Strings = {
     "Welcome! Choose tenant or landlord — same steps as WhatsApp.",
   tapMenu: "Tip: tap Main menu anytime to go back.",
   errorGeneric: "Something went wrong. Try again.",
+  errorUploadTooLarge: "File too large. Choose a smaller photo or a shorter video.",
+  errorUploadRead: "Could not read that file. Try again from the gallery.",
   invalidKenyaPhone: "Enter a Kenyan mobile number, e.g. 0712 345 678 or 254712345678.",
   tabChat: "Chat",
   tabBrowse: "Search",
