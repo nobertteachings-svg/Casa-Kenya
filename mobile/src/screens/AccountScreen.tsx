@@ -13,7 +13,7 @@ import { loadInbox, markInboxRead, type InboxItem } from "../storage/notificatio
 
 export type FlowLaunch = "list" | "verify" | "extras" | null;
 
-const DELETE_ACCOUNT_URL = "https://www.casahomeskenya.com/delete-account";
+const DELETE_ACCOUNT_URL = "https://api.casahomeskenya.com/delete-account";
 
 interface Props {
   token: string;

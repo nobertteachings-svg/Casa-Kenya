@@ -9,6 +9,7 @@ export interface CasaUser {
   role: UserRole;
   language: Language;
   display_name: string | null;
+  email?: string | null;
   landlordVerified?: boolean;
   tenantVerified?: boolean;
   paymentsEnabled?: boolean;
@@ -149,26 +150,32 @@ export function normalizePhone(input: string): string {
 
 export async function requestLoginCode(
   phone: string,
-  language?: Language
+  language?: Language,
+  extras?: { name?: string; email?: string }
 ): Promise<{
   ok: boolean;
   expiresIn: number;
-  delivery?: "whatsapp_template" | "whatsapp_click" | "review_bypass" | "existing_user";
-  whatsappUrl?: string;
+  delivery?: "email" | "review_bypass" | "existing_user";
+  email?: string;
   token?: string;
   needsSignup?: boolean;
   user?: CasaUser | null;
 }> {
   return request("/api/app/auth/request-code", {
     method: "POST",
-    body: JSON.stringify({ phone: normalizePhone(phone), language }),
+    body: JSON.stringify({
+      phone: normalizePhone(phone),
+      language,
+      name: extras?.name?.trim(),
+      email: extras?.email?.trim(),
+    }),
   });
 }
 
 export async function verifyLoginCode(
   phone: string,
   code: string
-): Promise<{ token: string; needsSignup: boolean; user: CasaUser | null }> {
+): Promise<{ token: string; needsSignup: boolean; user: CasaUser | null; phone?: string }> {
   return request("/api/app/auth/verify-code", {
     method: "POST",
     body: JSON.stringify({ phone: normalizePhone(phone), code: code.trim() }),

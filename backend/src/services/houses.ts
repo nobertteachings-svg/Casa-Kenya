@@ -15,6 +15,8 @@ export interface House {
   type: string;
   property_category?: string;
   property_subtype?: string;
+  bedroom_count?: number | null;
+  toilet_count?: number | null;
   region?: string | null;
   town?: string | null;
   rent: number;
@@ -45,6 +47,8 @@ export interface CreateHouseInput {
   type: string;
   property_category: PropertyCategory;
   property_subtype: string;
+  bedroom_count?: number;
+  toilet_count?: number;
   region: string;
   town: string;
   rent: number;
@@ -78,17 +82,20 @@ export async function createHouse(input: CreateHouseInput): Promise<House> {
   const result = await query<House>(
     `INSERT INTO houses (
       landlord_phone, type, property_category, property_subtype,
+      bedroom_count, toilet_count,
       region, town, rent, months_upfront,
       latitude, longitude, neighbourhood, city,
       fenced, water, borehole, parking, electricity, electricity_meter, furnished, security, standby_generator,
       photos, videos, trust_tier, ai_description
-    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25)
+    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27)
     RETURNING *`,
     [
       input.landlord_phone,
       input.type,
       input.property_category,
       input.property_subtype,
+      input.bedroom_count ?? null,
+      input.toilet_count ?? null,
       input.region,
       input.town,
       input.rent,

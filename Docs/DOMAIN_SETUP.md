@@ -122,7 +122,7 @@ Redeploy backend (or let Railway restart after variable change).
 
 ```env
 VITE_API_URL=https://api.casahomeskenya.com
-VITE_WHATSAPP_PHONE=254182623299
+VITE_WHATSAPP_PHONE=254710655157
 VITE_CONTACT_EMAIL=hello@casahomeskenya.com
 ```
 
@@ -153,7 +153,7 @@ Test: send a WhatsApp message to the business number; check backend logs.
 
 ---
 
-## Part F — Email mailboxes (optional)
+## Part F — Email mailboxes + Resend (login OTP)
 
 You purchased 3 mailboxes with the domain. Suggested:
 
@@ -164,6 +164,26 @@ You purchased 3 mailboxes with the domain. Suggested:
 | `admin@casahomeskenya.com` | Internal / Meta Business verification |
 
 Create them in the registrar’s email panel. Do not change MX records unless the email provider tells you to.
+
+### Resend domain (`casahomeskenya.com`) — Namecheap Advanced DNS
+
+App login codes send from `login@casahomeskenya.com` via Resend. Add these **new** records. Do **not** edit the existing `@` SPF (`v=spf1 include:spf.efwd.registrar-servers.com ~all`) or the `eforward*.registrar-servers.com` MX rows — those are Namecheap mailbox forwarding.
+
+| Type | Host | Value | TTL |
+|------|------|--------|-----|
+| TXT | `resend._domainkey` | `p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDWiNaHEccue5uXREWqnehQI0Fa/3FbQgRnOlAscQjJG2xTkuv8qhruYmSWUaCPE8/KZzHN7oZ0kOeixpVghIhe/4DKNSvVjRVbNhu2xZahBvtThR6z9L3hexJ8dROooj+n7q+o3ixwwByuV07zKtqNTMDso6tgXct0l2Z9J6cp3QIDAQAB` | Automatic |
+| CNAME | `rsend` | `rsend-euw1.forge.rmta.net` | Automatic |
+| CNAME | `send` | `send.forge.rmta.net` | Automatic |
+| TXT | `_dmarc` | `v=DMARC1; p=none;` | Automatic |
+
+Namecheap host is the left label only (`resend._domainkey`, not `resend._domainkey.casahomeskenya.com`). No quotes around TXT values.
+
+Then in Resend click **Verify**, and on Railway set:
+
+```env
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=Casa Kenya <login@casahomeskenya.com>
+```
 
 ---
 

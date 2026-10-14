@@ -8,20 +8,27 @@ import { env } from "../config/env.js";
 import { getSession, setSession } from "../redis/client.js";
 import { logger } from "../lib/logger.js";
 import { createRateLimiter } from "../middleware/rate-limit.js";
-import { findUser, createUser, isUserSuspended, updateUserLanguage } from "../services/users.js";
-import { sendAuthenticationOtp, sendTextMessage } from "../services/whatsapp.js";
+import {
+  attachUserEmailAndName,
+  createUser,
+  findUser,
+  findUserByEmail,
+  isUserSuspended,
+  updateUserLanguage,
+} from "../services/users.js";
 import {
   APP_OTP_TTL_SEC,
-  appLoginWhatsAppUrl,
   canonicalPhone,
   consumeLoginOtp,
   generateOTP,
-  loginOtpMessage,
   peekLoginOtp,
+  peekLoginProfile,
   phoneAliases,
   rememberOtpRequest,
   storeLoginOtp,
+  storeLoginProfile,
 } from "../services/app-otp.js";
+import { isResendConfigured, isValidEmail, normalizeEmail, sendLoginOtpEmail } from "../services/email-otp.js";
 import { upsertDeviceToken, deactivateAllDeviceTokens } from "../services/device-tokens.js";
 import { runWithAppTransport, type UIAction } from "../services/transport.js";
 import { routeMessage } from "../flows/router.js";
@@ -159,6 +166,7 @@ async function userPayload(user: Awaited<ReturnType<typeof findUser>>) {
     role: user.role,
     language: "en" as Language,
     display_name: user.display_name,
+    email: user.email ?? null,
   };
   if (user.role === "landlord") {
     return { ...base, landlordVerified: await isLandlordVerified(user.phone) };
@@ -189,12 +197,16 @@ appRouter.post("/auth/request-code", otpRequestLimiter, async (req: Request, res
     return;
   }
 
-  const lang = parseAppLanguage(req.body?.language) ?? "en";
+  const name = String(req.body?.name ?? "").trim().slice(0, 100);
+  const email = normalizeEmail(String(req.body?.email ?? ""));
   let existing = null;
   if (!reviewPhone) {
     for (const p of phoneAliases(rawPhone)) {
       existing = await findUser(p);
       if (existing) break;
+    }
+    if (!existing && email) {
+      existing = await findUserByEmail(email);
     }
   }
   if (existing) {
@@ -204,15 +216,22 @@ appRouter.post("/auth/request-code", otpRequestLimiter, async (req: Request, res
       });
       return;
     }
-    const token = signToken(existing.phone);
-    logger.info("App login without OTP", { phone: existing.phone });
+    await updateUserLanguage(existing.phone, "en").catch(() => undefined);
+    if (name || email) {
+      await attachUserEmailAndName(existing.phone, email || undefined, name || undefined).catch(
+        () => undefined
+      );
+    }
+    const refreshed = (await findUser(existing.phone)) ?? existing;
+    const token = signToken(refreshed.phone);
+    logger.info("App login without OTP", { phone: refreshed.phone });
     res.json({
       ok: true,
       delivery: "existing_user",
       expiresIn: OTP_TTL,
       token,
       needsSignup: false,
-      user: await userPayload(existing),
+      user: await userPayload(refreshed),
     });
     return;
   }
@@ -221,43 +240,50 @@ appRouter.post("/auth/request-code", otpRequestLimiter, async (req: Request, res
     appReviewOtpForPhone(rawPhone) ??
     phoneAliases(rawPhone).map(appReviewOtpForPhone).find(Boolean) ??
     null;
+  if (!reviewOtp) {
+    if (!name) {
+      res.status(400).json({ error: "Your name is required." });
+      return;
+    }
+    if (!isValidEmail(email)) {
+      res.status(400).json({ error: "A valid email address is required." });
+      return;
+    }
+  }
+
   const existingOtp = reviewOtp ? null : await peekLoginOtp(rawPhone);
   const otp = reviewOtp ?? existingOtp ?? generateOTP();
 
   try {
     await storeLoginOtp(rawPhone, otp);
     await rememberOtpRequest(rawPhone).catch(() => undefined);
+    if (email && name) {
+      await storeLoginProfile(rawPhone, { name, email }).catch(() => undefined);
+    }
   } catch (err) {
     logger.error("OTP store failed", { err: String(err) });
     res.status(503).json({ error: "Service unavailable, try again shortly" });
     return;
   }
 
-  const otpLang = "en" as const;
-  const whatsappUrl = appLoginWhatsAppUrl(otpLang);
-  let delivery: "whatsapp_template" | "whatsapp_click" | "review_bypass" = "whatsapp_click";
+  let delivery: "email" | "review_bypass" = "email";
 
   if (reviewPhone) {
     delivery = "review_bypass";
   } else {
-    const templated = await sendAuthenticationOtp(rawPhone, otp, otpLang, { discover: false });
-    if (templated) {
-      delivery = "whatsapp_template";
-    } else {
-      // Best-effort session text for people who already wrote Casa.
-      // New users still need the click-to-chat URL — Meta drops silent text.
-      try {
-        await sendTextMessage(rawPhone, loginOtpMessage(otp, otpLang));
-      } catch {
-        /* expected for first-time users */
-      }
-      delivery = "whatsapp_click";
-      logger.info("OTP template unavailable; returning WhatsApp click-to-chat", { phone: rawPhone });
+    if (!isResendConfigured()) {
+      res.status(503).json({ error: "Email delivery is not configured yet." });
+      return;
+    }
+    const sent = await sendLoginOtpEmail(email, otp, name);
+    if (!sent) {
+      res.status(503).json({ error: "Could not send the email code. Try again." });
+      return;
     }
   }
 
   logger.info("App OTP stored", { phone: rawPhone, delivery, reused: Boolean(existingOtp) });
-  res.json({ ok: true, expiresIn: OTP_TTL, delivery, whatsappUrl });
+  res.json({ ok: true, expiresIn: OTP_TTL, delivery, email: reviewPhone ? undefined : email });
 });
 
 // ---------------------------------------------------------------------------
@@ -307,11 +333,13 @@ appRouter.post("/auth/verify-code", otpVerifyLimiter, async (req: Request, res: 
       if (user) break;
     }
   }
-  const token = signToken(user?.phone ?? rawPhone);
-  logger.info("App login success", { phone: user?.phone ?? rawPhone, newUser: !user });
+  const accountPhone = user?.phone ?? rawPhone;
+  const token = signToken(accountPhone);
+  logger.info("App login success", { phone: accountPhone, newUser: !user });
 
   res.json({
     token,
+    phone: accountPhone,
     expiresIn: JWT_EXPIRY,
     needsSignup: !user,
     user: await userPayload(user),
@@ -353,7 +381,11 @@ appRouter.post("/register", appApiLimiter, requireAppAuth, async (req: Request, 
       ? req.body.referrer.replace(/\D/g, "")
       : undefined;
 
-  await createUser(phone, role, language);
+  const profile = await peekLoginProfile(phone).catch(() => null);
+  await createUser(phone, role, language, profile?.name, profile?.email);
+  if (profile?.email || profile?.name) {
+    await attachUserEmailAndName(phone, profile?.email, profile?.name).catch(() => undefined);
+  }
 
   if (referrer && referrer.length >= 8) {
     const { createReferral } = await import("../services/features/referrals.js");

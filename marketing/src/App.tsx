@@ -4,7 +4,7 @@ import LiveStats from "./components/LiveStats";
 import SocialLinks from "./components/SocialLinks";
 import { type Lang, t } from "./i18n";
 
-const WHATSAPP_PHONE = (import.meta.env.VITE_WHATSAPP_PHONE ?? "254182623299").replace(/\D/g, "");
+const WHATSAPP_PHONE = (import.meta.env.VITE_WHATSAPP_PHONE ?? "254710655157").replace(/\D/g, "");
 const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL ?? "hello@casahomeskenya.com";
 const SUPPORT_EMAIL = import.meta.env.VITE_SUPPORT_EMAIL ?? "support@casahomeskenya.com";
 const IOS_APP_URL =

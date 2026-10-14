@@ -83,6 +83,8 @@ function shortlistItem(house: Awaited<ReturnType<typeof findHouseById>>, lang: L
     trustTier: house.trust_tier ?? "standard",
     listedAt: house.created_at.toISOString(),
     thumbUrl: thumb ? resolvePublicThumbUrl(thumb, "image") ?? undefined : undefined,
+    bedroomCount: house.bedroom_count ?? undefined,
+    toiletCount: house.toilet_count ?? undefined,
     monthsUpfront: house.months_upfront,
   };
 }
@@ -93,6 +95,8 @@ function compareRow(house: NonNullable<Awaited<ReturnType<typeof findHouseById>>
     type: house.type,
     rent: house.rent,
     monthsUpfront: house.months_upfront,
+    bedroomCount: house.bedroom_count ?? undefined,
+    toiletCount: house.toilet_count ?? undefined,
     location: formatLocation(house.neighbourhood, house.city ?? null, house.town ?? null),
     amenities: {
       water: house.water,
@@ -303,7 +307,8 @@ appTenantRouter.get("/listings/:houseId/lease", async (req: Request, res: Respon
 appTenantRouter.post("/tenant-verification", async (req: Request, res: Response) => {
   const phone = await requireTenant(req, res);
   if (!phone) return;
-  const method = req.body?.method === "bank" ? "bank" : "id";
+  const rawMethod = String(req.body?.method ?? "").toLowerCase();
+  const method = rawMethod === "mpesa" || rawMethod === "momo" || rawMethod === "bank" ? "mpesa" : "id";
   await requestVerification(phone, method);
   await setSession(phone, {
     flow: "tenant_extras",

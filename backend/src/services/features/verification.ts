@@ -2,7 +2,7 @@ import { query } from "../../db/pool.js";
 
 export async function requestVerification(
   phone: string,
-  method: "id" | "bank"
+  method: "id" | "mpesa" | "bank"
 ): Promise<void> {
   await query(
     `UPDATE users SET verification_method = $2, updated_at = NOW() WHERE phone = $1`,

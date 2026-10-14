@@ -3,6 +3,8 @@ import type { Language } from "../api/client";
 type Strings = {
   loginSubtitle: string;
   phoneLabel: string;
+  nameLabel: string;
+  emailLabel: string;
   phoneNote: string;
   loginFirstTimeHint: string;
   otpWhatsappFailed: string;
@@ -10,6 +12,9 @@ type Strings = {
   codeLabel: string;
   codeHint: (phone: string, mins: number) => string;
   codeHintClick: (mins: number) => string;
+  codeHintEmail: (email: string, mins: number) => string;
+  codeHintReview: string;
+  goBack: string;
   continue: string;
   changeNumber: string;
   signupHint: string;
@@ -343,10 +348,12 @@ type Strings = {
 };
 
 const en: Strings = {
-  loginSubtitle: "Find your home — on the app or WhatsApp.",
-  phoneLabel: "Your WhatsApp number",
+  loginSubtitle: "Enter your details. We’ll email a 6-digit code.",
+  phoneLabel: "Your phone number",
+  nameLabel: "Your name",
+  emailLabel: "Email address",
   phoneNote:
-    "Already on Casa? Continue with your WhatsApp number. New here? We'll send a code on WhatsApp.",
+    "Already on Casa? Continue with your Kenyan number. New here? We’ll email a 6-digit code.",
   loginFirstTimeHint: "We'll send a 6-digit code on WhatsApp.",
   otpWhatsappFailed:
     "Could not send the WhatsApp code. Check the number and try again in a moment.",
@@ -356,6 +363,11 @@ const en: Strings = {
     `We sent a code to WhatsApp (${phone}). It expires in ${mins} minutes.`,
   codeHintClick: (mins) =>
     `WhatsApp will open. Tap Send — Casa replies with your 6-digit code. It expires in ${mins} minutes.`,
+  codeHintEmail: (email, mins) =>
+    `We emailed a code to ${email}. It expires in ${mins} minutes.`,
+  codeHintReview:
+    "App Review login: enter the 6-digit code from the App Review notes. No email needed.",
+  goBack: "Back",
   continue: "Continue",
   changeNumber: "Change number",
   signupHint: "Prefer WhatsApp?",

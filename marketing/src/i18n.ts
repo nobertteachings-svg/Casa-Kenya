@@ -151,7 +151,7 @@ export const copy = {
         },
         {
           q: "How do I get help?",
-          a: "Use the app, message WhatsApp on +254 182 623 299, or email support@casahomeskenya.com. General questions: hello@casahomeskenya.com.",
+          a: "Use the app, message WhatsApp on +254 710 655 157, or email support@casahomeskenya.com. General questions: hello@casahomeskenya.com.",
         },
       ],
     },

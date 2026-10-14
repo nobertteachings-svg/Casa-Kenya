@@ -46,12 +46,13 @@ npm run dev:backend
 - [ ] DNS: `casahomeskenya.com`, `www`, `api`, `admin`
 - [ ] `UNLOCK_FEE_KES` set (default 500 KES — adjust in market)
 - [ ] Cloudinary cloud or folder prefix separate from NG/CM
-- [ ] Marketing `VITE_WHATSAPP_PHONE` = Kenya digits with country code `254…`
+- [ ] Marketing `VITE_WHATSAPP_PHONE` = `254710655157`
 - [ ] GitHub repo `nobertteachings-svg/Casa-Kenya` (same account as Casa-Rwanda; SSH host `github.com-casa-rwanda`)
 - [ ] Expo: same account/project as Rwanda (`nobertteachingss-team` / `cd8a3e52-f3b4-49a3-95fa-8e9d3228ef20`)
 - [ ] iOS submit: same Apple id as Rwanda (`mutaleyinguhalain@gmail.com`)
 - [ ] Android: EAS build AAB, then **upload manually** in Play Console (`com.casahomeskenya.app`)
 - [ ] App Review phones: `APP_REVIEW_PHONE` / `APP_REVIEW_OTP` (254…)
+- [ ] Resend email login: `RESEND_API_KEY` + `RESEND_FROM_EMAIL` (verify casahomeskenya.com, or reuse a verified sender)
 
 ## Payments (future)
 

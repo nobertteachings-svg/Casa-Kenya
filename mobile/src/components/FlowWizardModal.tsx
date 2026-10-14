@@ -584,7 +584,7 @@ export default function FlowWizardModal({
               style={styles.textInput}
               value={whereForm.town}
               onChangeText={(town) => setWhereForm((s) => ({ ...s, town }))}
-              placeholder={"Nairobi, Nairobi…"}
+              placeholder={"Nairobi, Mombasa…"}
               placeholderTextColor={colors.mutedLight}
             />
             {MAJOR_TOWNS.length > 0 ? (

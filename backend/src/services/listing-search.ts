@@ -117,6 +117,8 @@ function houseToSearchListing(
     landlordVerified: false,
     trustTier: house.trust_tier ?? "standard",
     listedAt: house.created_at.toISOString(),
+    bedroomCount: house.bedroom_count ?? undefined,
+    toiletCount: house.toilet_count ?? undefined,
     monthsUpfront: house.months_upfront,
   };
 }

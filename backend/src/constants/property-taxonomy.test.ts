@@ -7,8 +7,12 @@ import {
   electricityMeterLabel,
   formatElectricityMeterMenu,
   formatSubtypeMenu,
+  defaultCountsForSubtype,
+  formatResidentialTypeLabel,
   legacyTypeFromSubtype,
   parseCategoryChoice,
+  parseRoomCount,
+  residentialSubtypeNeedsCounts,
   parseElectricityMeterChoice,
   parseRegionChoice,
   parseSubtypeChoice,
@@ -70,6 +74,24 @@ describe("property taxonomy", () => {
     expect(legacyTypeFromSubtype("studio")).toBe("apartment");
     expect(legacyTypeFromSubtype("office")).toBe("apartment");
     expect(legacyTypeFromSubtype("shop")).toBe("apartment");
+  });
+
+  it("asks for bedroom and toilet counts on larger homes", () => {
+    expect(residentialSubtypeNeedsCounts("studio")).toBe(true);
+    expect(residentialSubtypeNeedsCounts("two_bedroom")).toBe(true);
+    expect(residentialSubtypeNeedsCounts("bungalow")).toBe(true);
+    expect(residentialSubtypeNeedsCounts("shop")).toBe(false);
+    expect(defaultCountsForSubtype("bedsitter")).toEqual({ bedroom_count: 1, toilet_count: 1 });
+    expect(defaultCountsForSubtype("single_room")).toEqual({ bedroom_count: 1, toilet_count: 0 });
+    expect(parseRoomCount("3", 1, 15)).toBe(3);
+    expect(parseRoomCount("0", 0, 8)).toBe(0);
+    expect(parseRoomCount("99", 1, 15)).toBeNull();
+    expect(
+      formatResidentialTypeLabel(
+        { property_subtype: "two_bedroom", bedroom_count: 2, toilet_count: 1 },
+        "en"
+      )
+    ).toBe("2 bedroom · 2 beds · 1 toilet");
   });
 
   it("labels subtypes and categories in English", () => {

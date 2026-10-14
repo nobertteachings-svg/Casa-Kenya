@@ -1,0 +1,19 @@
+# EAS uploads from the git root. Keep the iOS tarball small.
+Docs/
+marketing/
+admin/
+backend/
+db/
+packages/
+scripts/
+*.pdf
+*.mp4
+/casa_*.png
+mobile/dist/
+mobile/node_modules/
+mobile/.expo/
+mobile/credentials/
+mobile/credentials.json
+.env
+.railway/
+coverage/

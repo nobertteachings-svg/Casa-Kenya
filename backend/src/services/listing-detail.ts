@@ -102,6 +102,8 @@ export function houseToListingDetail(
     type: formatResidentialTypeLabel(house, lang),
     propertyCategory: house.property_category ?? "residential",
     propertySubtype: house.property_subtype ?? undefined,
+    bedroomCount: house.bedroom_count ?? undefined,
+    toiletCount: house.toilet_count ?? undefined,
     rent: house.rent,
     monthsUpfront: house.months_upfront,
     location: formatLocation(house.neighbourhood, house.city ?? null, house.town ?? null),

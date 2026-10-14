@@ -37,7 +37,7 @@ router.get("/privacy", (_req: Request, res: Response) => {
 
   <h2>Information we collect</h2>
   <ul>
-    <li>Phone number and display name when you use the Casa Kenya app or message us on WhatsApp</li>
+    <li>Name, email address, and phone number when you sign in to the Casa Kenya app, and your display name if you message us on WhatsApp</li>
     <li>Messages you send (search preferences, listing details, photos/videos you upload)</li>
     <li>Location pins you choose to share for nearby search</li>
     <li>Landlord identity documents submitted for verification (e.g. National ID / passport images)</li>
@@ -120,6 +120,39 @@ router.get("/terms", (_req: Request, res: Response) => {
   <h2>Contact</h2>
   <p><a href="mailto:hello@casahomeskenya.com">hello@casahomeskenya.com</a></p>
   <p>Also see our <a href="/privacy">Privacy Policy</a>.</p>
+`
+      )
+    );
+});
+
+router.get("/delete-account", (_req: Request, res: Response) => {
+  res
+    .type("html")
+    .send(
+      page(
+        "Delete your account",
+        `
+  <h1>Delete your Casa account</h1>
+  <p class="muted">Last updated: 3 October 2026</p>
+  <p>This page explains how to request deletion of your <strong>Casa Kenya</strong> account and personal data from the Casa Kenya app, WhatsApp, and casahomeskenya.com.</p>
+
+  <h2>How to request deletion</h2>
+  <ol>
+    <li>Message Casa Kenya on WhatsApp at <a href="https://wa.me/254710655157">+254 710 655 157</a> and write “Delete my account”, or</li>
+    <li>Email <a href="mailto:hello@casahomeskenya.com">hello@casahomeskenya.com</a> from the phone or email on your account, subject line “Delete my data”.</li>
+  </ol>
+  <p>We will remove or anonymise personal data within a reasonable period, except where Kenyan law requires us to keep records for safety, fraud prevention, or legal reasons.</p>
+
+  <h2>What we delete</h2>
+  <ul>
+    <li>Your phone number, display name, and login session</li>
+    <li>Saved searches, shortlists, and unlock history tied to your account</li>
+    <li>Landlord listings and media you uploaded, if you ask us to remove them</li>
+    <li>Identity documents submitted for verification</li>
+  </ul>
+
+  <h2>Privacy</h2>
+  <p>See the full <a href="/privacy">Privacy Policy</a>.</p>
 `
       )
     );

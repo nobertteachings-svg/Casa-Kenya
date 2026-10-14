@@ -59,7 +59,7 @@ export function isPendingOtpFollowup(text: string): boolean {
 }
 
 export function appLoginWhatsAppUrl(_lang: "en" = "en"): string {
-  const phone = (env.PUBLIC_WHATSAPP_PHONE || "254182623299").replace(/\D/g, "");
+  const phone = (env.PUBLIC_WHATSAPP_PHONE || "254710655157").replace(/\D/g, "");
   const text =
     `${APP_LOGIN_TRIGGER}\nSend this message to get your Casa login code.`;
   return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
@@ -85,6 +85,35 @@ export async function storeLoginOtp(phone: string, otp: string): Promise<void> {
     pipe.set(otpCodeKey(digits), canonicalPhone(phone), "EX", APP_OTP_TTL_SEC);
   }
   await pipe.exec();
+}
+
+export interface LoginProfile {
+  name: string;
+  email: string;
+}
+
+function loginProfileKey(phone: string): string {
+  return `casa:login-profile:${canonicalPhone(phone)}`;
+}
+
+export async function storeLoginProfile(phone: string, profile: LoginProfile): Promise<void> {
+  const p = canonicalPhone(phone);
+  if (p.length < 7) return;
+  await redis.set(loginProfileKey(p), JSON.stringify(profile), "EX", APP_OTP_TTL_SEC);
+}
+
+export async function peekLoginProfile(phone: string): Promise<LoginProfile | null> {
+  for (const p of phoneAliases(phone)) {
+    const raw = await redis.get(loginProfileKey(p));
+    if (!raw) continue;
+    try {
+      const parsed = JSON.parse(raw) as LoginProfile;
+      if (parsed.email) return parsed;
+    } catch {
+      /* ignore */
+    }
+  }
+  return null;
 }
 
 export async function rememberOtpRequest(phone: string): Promise<void> {

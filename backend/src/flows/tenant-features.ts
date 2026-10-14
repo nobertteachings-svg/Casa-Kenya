@@ -112,11 +112,11 @@ export async function handleTenantExtras(
   }
 
   if (step === "verify_method") {
-    const method = choice === "2" ? "bank" : "id";
+    const method = choice === "2" ? "mpesa" : "id";
     await requestVerification(phone, method);
     await sendTextMessage(
       phone,
-      "✅ Request received. Send a National ID/ID photo or confirm your Kenyan bank account. Badge active after admin verification.");
+      "✅ Request received. Send a National ID/ID photo or confirm your M-Pesa number. Badge active after admin verification.");
     await showMainMenu(phone, "tenant", lang);
     return;
   }

@@ -223,8 +223,8 @@ describe("houses service", () => {
 
     expect(result.house_id).toBe("CASA-NEW");
     const insertArgs = mockedQuery.mock.calls[0][1] as unknown[];
-    expect(insertArgs[16]).toBe(true);
-    expect(insertArgs[17]).toBe("prepaid");
+    expect(insertArgs[18]).toBe(true);
+    expect(insertArgs[19]).toBe("prepaid");
   });
 
   it("updates listing status for the owning landlord only", async () => {

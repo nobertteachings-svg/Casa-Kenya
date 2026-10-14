@@ -21,10 +21,10 @@ LOCKUP_GREEN = (52, 178, 74)
 
 def font(size: int, bold: bool = True) -> ImageFont.FreeTypeFont:
     candidates = [
-        "/System/Library/Fonts/Supplemental/Arial Rounded Bold.ttf",
         "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
         "/Library/Fonts/Arial Bold.ttf",
         "/System/Library/Fonts/Helvetica.ttc",
+        "/System/Library/Fonts/Supplemental/Arial Rounded Bold.ttf",
     ]
     for path in candidates:
         try:
@@ -74,7 +74,9 @@ def centered_text(
     bbox = draw.textbbox((0, 0), text, font=fnt)
     tw = bbox[2] - bbox[0]
     th = bbox[3] - bbox[1]
-    draw.text(((canvas_w - tw) / 2, cy - th / 2), text, font=fnt, fill=fill)
+    x = (canvas_w - tw) / 2 - bbox[0]
+    y = cy - th / 2 - bbox[1]
+    draw.text((x, y), text, font=fnt, fill=fill)
 
 
 def make_feature_graphic(path: Path) -> None:

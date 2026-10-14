@@ -75,7 +75,7 @@ export function landlordSubmenuOptions(lang: Language = "en"): MenuOption[] {
 export function verificationMethodOptions(lang: Language = "en"): MenuOption[] {
   return [
         { id: "1", title: "Name document photo" },
-        { id: "2", title: "Bank account" },
+        { id: "2", title: "M-Pesa number" },
       ];
 }
 

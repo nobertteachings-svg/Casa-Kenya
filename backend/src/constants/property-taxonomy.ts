@@ -199,16 +199,70 @@ export function categoryLabel(category: PropertyCategory, lang?: Language): stri
   return "Residential";
 }
 
+export const MAX_BEDROOM_COUNT = 15;
+export const MAX_TOILET_COUNT = 8;
+
+export function residentialSubtypeNeedsCounts(subtype: string): boolean {
+  return (
+    subtype === "studio" ||
+    subtype === "one_bedroom" ||
+    subtype === "two_bedroom" ||
+    subtype === "three_bedroom_plus" ||
+    subtype === "maisonette" ||
+    subtype === "bungalow"
+  );
+}
+
+export function defaultCountsForSubtype(
+  subtype: string
+): { bedroom_count: number; toilet_count: number } | null {
+  switch (subtype) {
+    case "single_room":
+      return { bedroom_count: 1, toilet_count: 0 };
+    case "double_room":
+      return { bedroom_count: 2, toilet_count: 0 };
+    case "bedsitter":
+    case "servant_quarter":
+      return { bedroom_count: 1, toilet_count: 1 };
+    default:
+      return null;
+  }
+}
+
+export function parseRoomCount(input: string, min: number, max: number): number | null {
+  const n = parseInt(input.replace(/\D/g, ""), 10);
+  if (!Number.isFinite(n) || n < min || n > max) return null;
+  return n;
+}
+
 /** Display label for a listing type in the mobile API. */
 export function formatResidentialTypeLabel(
-  house: { type?: string; property_subtype?: string; property_category?: string },
+  house: {
+    type?: string;
+    property_subtype?: string;
+    property_category?: string;
+    bedroom_count?: number | null;
+    toilet_count?: number | null;
+  },
   lang: Language
 ): string {
-  if (house.property_subtype) return subtypeLabel(house.property_subtype, lang);
-  if (house.property_category === "commercial" || house.property_category === "residential") {
-    return categoryLabel(house.property_category, lang);
+  const base = house.property_subtype
+    ? subtypeLabel(house.property_subtype, lang)
+    : house.property_category === "commercial" || house.property_category === "residential"
+      ? categoryLabel(house.property_category, lang)
+      : house.type?.trim() || "Home";
+  if (
+    house.property_subtype &&
+    residentialSubtypeNeedsCounts(house.property_subtype) &&
+    house.bedroom_count != null
+  ) {
+    const beds = house.bedroom_count;
+    const toilets = house.toilet_count ?? 0;
+    const bedLabel = beds === 1 ? "1 bed" : `${beds} beds`;
+    const toiletLabel = toilets === 1 ? "1 toilet" : `${toilets} toilets`;
+    return `${base} · ${bedLabel} · ${toiletLabel}`;
   }
-  return house.type?.trim() || "Home";
+  return base;
 }
 
 export function formatRegionMenu(lang: Language): string {

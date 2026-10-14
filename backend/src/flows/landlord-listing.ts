@@ -2,16 +2,21 @@ import { t } from "../i18n/index.js";
 import type { Language } from "../i18n/messages.js";
 import {
   categoryLabel,
+  defaultCountsForSubtype,
   formatElectricityMeterMenu,
   formatFacilitiesSummary,
   formatRegionMenu,
   formatSubtypeMenu,
   legacyTypeFromSubtype,
+  MAX_BEDROOM_COUNT,
+  MAX_TOILET_COUNT,
   parseCategoryChoice,
   parseElectricityMeterChoice,
   parseRegionChoice,
+  parseRoomCount,
   parseSubtypeChoice,
   regionLabel,
+  residentialSubtypeNeedsCounts,
   subtypeLabel,
   type ElectricityMeter,
   type PropertyCategory,
@@ -37,6 +42,8 @@ type ListingDraft = {
   type?: string;
   property_category?: PropertyCategory;
   property_subtype?: string;
+  bedroom_count?: number;
+  toilet_count?: number;
   region?: string;
   town?: string;
   rent?: number;
@@ -100,6 +107,12 @@ function formatDraftSummary(draft: ListingDraft, lang: Language): string {
   if (draft.property_subtype) {
     lines.push(
       `Type: ${subtypeLabel(draft.property_subtype, lang)}`);
+  }
+  if (draft.bedroom_count != null) {
+    lines.push(`Bedrooms: ${draft.bedroom_count}`);
+  }
+  if (draft.toilet_count != null) {
+    lines.push(`Toilets: ${draft.toilet_count}`);
   }
   lines.push(
     `Rent: ${draft.rent?.toLocaleString() ?? "?"} KES/month`);
@@ -280,15 +293,76 @@ export async function handleLandlordListing(
       }
       draft.property_subtype = subtype;
       draft.type = legacyTypeFromSubtype(subtype);
+      const defaults = defaultCountsForSubtype(subtype);
+      if (defaults) {
+        draft.bedroom_count = defaults.bedroom_count;
+        draft.toilet_count = defaults.toilet_count;
+        await setSession(phone, {
+          flow: "landlord_listing",
+          step: "rent",
+          language: lang,
+          data: draft,
+        });
+        await sendTextMessage(phone, "Monthly rent in KES?");
+        return;
+      }
+      if (residentialSubtypeNeedsCounts(subtype)) {
+        await setSession(phone, {
+          flow: "landlord_listing",
+          step: "bedroom_count",
+          language: lang,
+          data: draft,
+        });
+        await sendTextMessage(
+          phone,
+          "How many bedrooms (including sitting room)? Type a number (e.g. 2, 3)."
+        );
+        return;
+      }
       await setSession(phone, {
         flow: "landlord_listing",
         step: "rent",
         language: lang,
         data: draft,
       });
+      await sendTextMessage(phone, "Monthly rent in KES?");
+      return;
+    }
+
+    case "bedroom_count": {
+      const count = parseRoomCount(choice, 1, MAX_BEDROOM_COUNT);
+      if (count === null) {
+        await sendTextMessage(phone, t(lang).invalidChoice);
+        return;
+      }
+      draft.bedroom_count = count;
+      await setSession(phone, {
+        flow: "landlord_listing",
+        step: "toilet_count",
+        language: lang,
+        data: draft,
+      });
       await sendTextMessage(
         phone,
-        "Monthly rent in KES?");
+        "How many toilets / bathrooms? Type a number (0 if none)."
+      );
+      return;
+    }
+
+    case "toilet_count": {
+      const count = parseRoomCount(choice, 0, MAX_TOILET_COUNT);
+      if (count === null) {
+        await sendTextMessage(phone, t(lang).invalidChoice);
+        return;
+      }
+      draft.toilet_count = count;
+      await setSession(phone, {
+        flow: "landlord_listing",
+        step: "rent",
+        language: lang,
+        data: draft,
+      });
+      await sendTextMessage(phone, "Monthly rent in KES?");
       return;
     }
 
@@ -581,7 +655,9 @@ export async function handleLandlordListing(
         !draft.neighbourhood ||
         !draft.rent ||
         !draft.latitude ||
-        !draft.longitude
+        !draft.longitude ||
+        (residentialSubtypeNeedsCounts(draft.property_subtype) &&
+          (draft.bedroom_count == null || draft.toilet_count == null))
       ) {
         await sendTextMessage(
           phone,
@@ -610,6 +686,8 @@ export async function handleLandlordListing(
         type: draft.type ?? legacyTypeFromSubtype(draft.property_subtype),
         property_category: draft.property_category,
         property_subtype: draft.property_subtype,
+        bedroom_count: draft.bedroom_count,
+        toilet_count: draft.toilet_count,
         region: draft.region,
         town: draft.town,
         rent: draft.rent,

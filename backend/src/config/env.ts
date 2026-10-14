@@ -76,12 +76,14 @@ const envSchema = z.object({
   /** Public backend URL for absolute media links */
   PUBLIC_API_URL: z.string().optional(),
   /** Public E.164 digits for Casa WhatsApp (wa.me links). */
-  PUBLIC_WHATSAPP_PHONE: z.string().optional().default("254182623299"),
+  PUBLIC_WHATSAPP_PHONE: z.string().optional().default("254710655157"),
   APP_JWT_SECRET: z.string().optional(),
   APP_OTP_TTL_SEC: z.coerce.number().default(600),
   /** Meta-approved WhatsApp authentication template for app login OTP. */
   WHATSAPP_OTP_TEMPLATE_NAME: z.string().optional().default("casa_login_code"),
   WHATSAPP_OTP_TEMPLATE_LANG_EN: z.string().default("en"),
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM_EMAIL: z.string().optional().default("Casa Kenya <login@casahomeskenya.com>"),
   APP_REVIEW_PHONE: z.string().optional(),
   APP_REVIEW_OTP: z.string().optional(),
   APP_REVIEW_PHONE_2: z.string().optional(),
@@ -101,7 +103,7 @@ export const isClaudeConfigured = Boolean(env.ANTHROPIC_API_KEY);
 export const isPaymentsEnabled = env.PAYMENTS_ENABLED;
 
 export function casaWhatsAppLink(prefill?: string): string {
-  const digits = env.PUBLIC_WHATSAPP_PHONE.replace(/\D/g, "") || "254182623299";
+  const digits = env.PUBLIC_WHATSAPP_PHONE.replace(/\D/g, "") || "254710655157";
   const text = prefill?.trim() ? `?text=${encodeURIComponent(prefill)}` : "";
   return `https://wa.me/${digits}${text}`;
 }
